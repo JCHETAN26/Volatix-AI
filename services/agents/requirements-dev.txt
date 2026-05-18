@@ -1,0 +1,4 @@
+# Dev / CI-only deps. The stdlib-friendly tests (state schema, graph
+# routing with the MockChatLLM) need pydantic + langgraph + pytest only.
+-r requirements.txt
+pytest==8.3.4

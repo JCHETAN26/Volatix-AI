@@ -162,14 +162,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: pip
 
       - name: Install dev deps
-        run: pip install pytest
+        run: |
+          pip install pytest
+          # Agent state + graph routing tests need pydantic + langgraph.
+          pip install -r services/agents/requirements.txt
 
-      - name: FeatureFrame round-trip test
+      - name: Classifier — FeatureFrame round-trip
         run: |
           cd services/classifier
           PYTHONPATH=.. pytest -q tests/test_feature_frame.py
+
+      - name: Agents — state + graph routing
+        run: |
+          cd services/agents
+          PYTHONPATH=.. pytest -q tests
 
       - name: Byte-compile every Python file
         run: |

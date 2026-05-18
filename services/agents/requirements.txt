@@ -1,0 +1,12 @@
+# ChainGuard-Core agents service runtime deps.
+# LangGraph + langchain-core power the 3-tier graph. langchain-openai and
+# langchain-ollama are both installed so LLM_PROVIDER can pick either at
+# runtime; the mock provider has zero extra deps.
+langgraph==0.2.60
+langchain-core==0.3.27
+langchain-openai==0.2.14
+langchain-ollama==0.2.2
+pydantic==2.10.4
+httpx==0.28.1
+kafka-python==2.0.2
+psycopg2-binary==2.9.10
