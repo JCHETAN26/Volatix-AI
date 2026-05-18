@@ -171,6 +171,49 @@ watch-pods:  ## Watch chainguard pods + the KEDA-managed HPA
 	@echo "Ctrl-C to stop."
 	kubectl get pods,hpa -l app.kubernetes.io/name=chainguard-engine --watch
 
+# ---------------------------------------------------------------------------
+# Phase 4.1 — Python classifier + Airflow
+# ---------------------------------------------------------------------------
+CLASSIFIER_IMAGE_NAME ?= chainguard-classifier
+CLASSIFIER_IMAGE_TAG  ?= dev
+
+.PHONY: init-postgres
+init-postgres:  ## Apply scripts/sql/init.sql to chain-db
+	./scripts/init-postgres.sh
+
+.PHONY: classifier-test
+classifier-test:  ## Run pytest against the classifier package
+	cd services/classifier && PYTHONPATH=.. pytest -q tests
+
+.PHONY: classifier-train-baseline
+classifier-train-baseline:  ## Generate services/classifier/models/baseline.txt
+	PYTHONPATH=services python3 services/classifier/scripts/train_baseline.py
+
+.PHONY: classifier-build
+classifier-build:  ## Build the classifier image (also bakes baseline.txt)
+	docker build -f services/classifier/Dockerfile \
+	    -t $(CLASSIFIER_IMAGE_NAME):$(CLASSIFIER_IMAGE_TAG) .
+
+.PHONY: classifier-load
+classifier-load: classifier-build  ## Load into Minikube
+	minikube image load $(CLASSIFIER_IMAGE_NAME):$(CLASSIFIER_IMAGE_TAG)
+
+.PHONY: classifier-deploy
+classifier-deploy:  ## Apply k8s/classifier-deployment.yaml
+	kubectl apply -f k8s/classifier-deployment.yaml
+
+.PHONY: classifier-undeploy
+classifier-undeploy:  ## Remove the classifier Deployment + PVC + ConfigMap
+	kubectl delete -f k8s/classifier-deployment.yaml --ignore-not-found
+
+.PHONY: airflow-install
+airflow-install:  ## helm install Apache Airflow (DAGs mounted from ConfigMap)
+	./scripts/install-airflow.sh
+
+.PHONY: airflow-ui
+airflow-ui:  ## Port-forward the Airflow webserver to localhost:8080
+	kubectl port-forward -n $${AIRFLOW_NAMESPACE:-airflow} svc/airflow-webserver 8080:8080
+
 .PHONY: mock-ticker
 mock-ticker:  ## Run the dev WebSocket ticker on ws://localhost:8765 (Ctrl-C to stop)
 	python3 scripts/mock-ticker.py --rate $${MOCK_RATE:-25000}

@@ -25,6 +25,7 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
       cpp: ${{ steps.filter.outputs.cpp }}
       docker: ${{ steps.filter.outputs.docker }}
+      python: ${{ steps.filter.outputs.python }}
     steps:
       - uses: actions/checkout@v4
       - id: filter
@@ -44,6 +45,10 @@ jobs:
               - '.dockerignore'
               - 'src/**'
               - 'CMakeLists.txt'
+              - '.github/workflows/ci.yml'
+            python:
+              - 'services/**'
+              - 'airflow/**'
               - '.github/workflows/ci.yml'
 
   # ----------------------------------------------------------------------
@@ -142,6 +147,35 @@ jobs:
         run: ./build/bin/chainguard
 
   # ----------------------------------------------------------------------
+  # Python services + Airflow DAGs.
+  # Only stdlib-only tests run here for speed — full-stack tests (LightGBM,
+  # Kafka, Postgres) live in their respective service images and run inside
+  # the cluster.
+  # ----------------------------------------------------------------------
+  python-ci:
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dev deps
+        run: pip install pytest
+
+      - name: FeatureFrame round-trip test
+        run: |
+          cd services/classifier
+          PYTHONPATH=.. pytest -q tests/test_feature_frame.py
+
+      - name: Byte-compile every Python file
+        run: |
+          python -m compileall -q services airflow
+
+  # ----------------------------------------------------------------------
   # Container image — multi-stage Dockerfile, with a <150MB size gate
   # enforcing the Phase 3.1 acceptance line.
   # ----------------------------------------------------------------------
@@ -182,7 +216,7 @@ jobs:
   # Passes only when every triggered job succeeded (or was skipped).
   # ----------------------------------------------------------------------
   ci:
-    needs: [frontend-ci, cpp-ci, docker-ci]
+    needs: [frontend-ci, cpp-ci, docker-ci, python-ci]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -191,8 +225,9 @@ jobs:
           fe='${{ needs.frontend-ci.result }}'
           cpp='${{ needs.cpp-ci.result }}'
           dk='${{ needs.docker-ci.result }}'
-          echo "frontend-ci=$fe  cpp-ci=$cpp  docker-ci=$dk"
-          for r in "$fe" "$cpp" "$dk"; do
+          py='${{ needs.python-ci.result }}'
+          echo "frontend-ci=$fe  cpp-ci=$cpp  docker-ci=$dk  python-ci=$py"
+          for r in "$fe" "$cpp" "$dk" "$py"; do
             if [ "$r" != "success" ] && [ "$r" != "skipped" ]; then
               echo "::error::A required CI job did not pass."
               exit 1

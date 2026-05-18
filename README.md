@@ -178,17 +178,24 @@ brew install cmake librdkafka openssl pkg-config boost simdjson
 export PKG_CONFIG_PATH="$(brew --prefix openssl)/lib/pkgconfig:$(brew --prefix librdkafka)/lib/pkgconfig:$(brew --prefix simdjson)/lib/pkgconfig"
 ```
 
-### 3. Run the analytics & agent stack
+### 3. Run the analytics & agent stack (Phase 4)
 ```bash
-# Python classifier consumer
-python services/classifier/main.py
+# One-time schema setup
+make init-postgres
 
-# LangGraph agent cluster
-python services/agents/graph.py
+# Build + load the Python classifier image (bakes a baseline LightGBM
+# model from synthetic data so the service can boot cold)
+make classifier-load
+make classifier-deploy
 
-# Airflow retraining DAG (KubernetesPodOperator)
-airflow dags trigger retraining_pipeline
+# Install Airflow with the chainguard retraining DAG mounted in
+make airflow-install
+make airflow-ui                       # → http://localhost:8080 (admin/admin)
+
+# Run unit tests for the FeatureFrame layout / kernels
+make classifier-test
 ```
+The classifier subscribes to `financial-features` (produced by the C++ engine), decodes each 64-byte FeatureFrame, runs LightGBM, and publishes the score on `anomaly-scores`. Frames + scores are mirrored into PostgreSQL (`feature_log`, `anomaly_score_log`) so the nightly Airflow DAG can retrain on real traffic via Purged K-Fold cross-validation.
 
 ### 4. Launch the dashboard
 ```bash
