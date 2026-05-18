@@ -1,0 +1,130 @@
+# ChainGuard-Core — Vector Database (Qdrant)
+# Phase 1 / Task 1.2.
+#
+# Standalone Qdrant deployment for the Agentic RAG layer (used in Phase 4 by
+# the Forensic Investigator agent for historical exploit lookups).
+#
+# Exposed at: vector-db.default.svc.cluster.local
+#   - 6333  REST/HTTP   (validation + admin)
+#   - 6334  gRPC        (high-throughput client path)
+#
+# Storage: emptyDir for the local-dev MVP (collections recreated on pod
+# restart, which is fine for the demo). Swap to a PersistentVolumeClaim if
+# you need durability between Minikube restarts.
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vector-db-config
+  labels:
+    app.kubernetes.io/name: vector-db
+    app.kubernetes.io/component: rag-store
+    app.kubernetes.io/part-of: chainguard-core
+data:
+  # Minimal Qdrant config. The image ships sensible defaults; we only
+  # override telemetry (off for local dev) and log level.
+  production.yaml: |
+    log_level: INFO
+    telemetry_disabled: true
+    service:
+      http_port: 6333
+      grpc_port: 6334
+      enable_cors: true
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vector-db
+  labels:
+    app.kubernetes.io/name: vector-db
+    app.kubernetes.io/component: rag-store
+    app.kubernetes.io/part-of: chainguard-core
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # emptyDir storage — no rolling needed.
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vector-db
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vector-db
+        app.kubernetes.io/component: rag-store
+        app.kubernetes.io/part-of: chainguard-core
+    spec:
+      containers:
+        - name: qdrant
+          image: qdrant/qdrant:v1.12.4
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 6333
+              protocol: TCP
+            - name: grpc
+              containerPort: 6334
+              protocol: TCP
+          env:
+            - name: QDRANT__SERVICE__HTTP_PORT
+              value: "6333"
+            - name: QDRANT__SERVICE__GRPC_PORT
+              value: "6334"
+            - name: QDRANT__TELEMETRY_DISABLED
+              value: "true"
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          volumeMounts:
+            - name: storage
+              mountPath: /qdrant/storage
+            - name: config
+              mountPath: /qdrant/config/production.yaml
+              subPath: production.yaml
+      volumes:
+        - name: storage
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: vector-db-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vector-db
+  labels:
+    app.kubernetes.io/name: vector-db
+    app.kubernetes.io/component: rag-store
+    app.kubernetes.io/part-of: chainguard-core
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: vector-db
+  ports:
+    - name: http
+      port: 6333
+      targetPort: http
+      protocol: TCP
+    - name: grpc
+      port: 6334
+      targetPort: grpc
+      protocol: TCP

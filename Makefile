@@ -1,0 +1,89 @@
+# ChainGuard-Core — developer convenience Makefile
+# Phase 1+: wraps the most common Minikube / Helm / kubectl flows so you can
+# bring the whole local stack up with `make infra-up` and verify with
+# `make validate`.
+
+SHELL          := /usr/bin/env bash
+.SHELLFLAGS    := -eu -o pipefail -c
+.DEFAULT_GOAL  := help
+
+NAMESPACE      ?= default
+KAFKA_RELEASE  ?= chain-kafka
+DB_RELEASE     ?= chain-db
+
+# ---------------------------------------------------------------------------
+# Help
+# ---------------------------------------------------------------------------
+.PHONY: help
+help:  ## Show available targets
+	@awk 'BEGIN {FS = ":.*##"; printf "Targets:\n"} \
+		/^[a-zA-Z0-9_.-]+:.*##/ {printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}' \
+		$(MAKEFILE_LIST)
+
+# ---------------------------------------------------------------------------
+# Phase 1 — Local infrastructure
+# ---------------------------------------------------------------------------
+.PHONY: infra-up
+infra-up:  ## Start Minikube + Kafka + Postgres + Vector DB
+	./scripts/bootstrap-infra.sh
+
+.PHONY: infra-down
+infra-down:  ## Uninstall Helm releases + vector-db (cluster stays up)
+	./scripts/teardown-infra.sh
+
+.PHONY: infra-stop
+infra-stop:  ## Soft teardown then minikube stop
+	./scripts/teardown-infra.sh --full
+
+.PHONY: infra-nuke
+infra-nuke:  ## DESTRUCTIVE: delete the Minikube cluster entirely
+	./scripts/teardown-infra.sh --nuke
+
+.PHONY: pods
+pods:  ## Show pods in the chainguard namespace
+	kubectl get pods -n $(NAMESPACE)
+
+# ---------------------------------------------------------------------------
+# Validation
+# ---------------------------------------------------------------------------
+.PHONY: validate
+validate: validate-pg validate-vector  ## Run all Phase 1 acceptance checks
+
+.PHONY: validate-pg
+validate-pg:  ## Run SELECT version() against chain-db
+	./scripts/validate-postgres.sh
+
+.PHONY: validate-vector
+validate-vector:  ## Create/get/delete a Qdrant collection via localhost:6333
+	python3 scripts/validate-vector-db.py
+
+# ---------------------------------------------------------------------------
+# Port-forwards (run in separate terminals as needed)
+# ---------------------------------------------------------------------------
+.PHONY: port-forward-vector
+port-forward-vector:  ## Forward vector-db 6333/6334 to localhost
+	kubectl port-forward -n $(NAMESPACE) svc/vector-db 6333:6333 6334:6334
+
+.PHONY: port-forward-pg
+port-forward-pg:  ## Forward postgres 5432 to localhost
+	kubectl port-forward -n $(NAMESPACE) svc/$(DB_RELEASE)-postgresql 5432:5432
+
+.PHONY: port-forward-kafka
+port-forward-kafka:  ## Forward Kafka 9092 to localhost
+	kubectl port-forward -n $(NAMESPACE) svc/$(KAFKA_RELEASE) 9092:9092
+
+# ---------------------------------------------------------------------------
+# C++ engine (Phase 2)
+# ---------------------------------------------------------------------------
+.PHONY: cpp-build
+cpp-build:  ## Configure + build the C++ engine
+	cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+	cmake --build build --parallel
+
+.PHONY: cpp-run
+cpp-run: cpp-build  ## Run the chainguard binary
+	./build/bin/chainguard
+
+.PHONY: cpp-clean
+cpp-clean:  ## Remove the local CMake build directory
+	rm -rf build
