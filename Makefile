@@ -110,6 +110,37 @@ cpp-engine: cpp-build  ## Full pipeline: WS → ring → features → Kafka topi
 cpp-feature-bench: cpp-build  ## Frame-gen latency bench (Phase 2.3 acceptance: median <50µs)
 	./build/bin/chainguard --feature-bench
 
+# ---------------------------------------------------------------------------
+# Phase 3 — Container image
+# ---------------------------------------------------------------------------
+IMAGE_NAME ?= chainguard-core
+IMAGE_TAG  ?= dev
+
+.PHONY: docker-build
+docker-build:  ## Build the multi-stage container image
+	docker build -t $(IMAGE_NAME):$(IMAGE_TAG) .
+
+.PHONY: docker-size
+docker-size: docker-build  ## Print final image size in MB (Phase 3.1 acceptance: <150MB)
+	@bytes=$$(docker image inspect $(IMAGE_NAME):$(IMAGE_TAG) --format '{{.Size}}'); \
+	mb=$$(( bytes / 1024 / 1024 )); \
+	echo "image size: $$mb MB"; \
+	if [ $$mb -ge 150 ]; then \
+	    echo "  → FAIL: exceeds 150MB ceiling"; exit 1; \
+	else \
+	    echo "  → meets acceptance (< 150MB)"; \
+	fi
+
+.PHONY: docker-run
+docker-run:  ## Run --version inside the container
+	docker run --rm $(IMAGE_NAME):$(IMAGE_TAG) --version
+
+.PHONY: docker-shell
+docker-shell:  ## Probe the distroless layout via debug variant (one-off debugging)
+	docker run --rm -it --entrypoint=/busybox/sh \
+	    $(IMAGE_NAME):$(IMAGE_TAG)-debug || \
+	    echo "Build with: docker build -t $(IMAGE_NAME):$(IMAGE_TAG)-debug --target builder ."
+
 .PHONY: mock-ticker
 mock-ticker:  ## Run the dev WebSocket ticker on ws://localhost:8765 (Ctrl-C to stop)
 	python3 scripts/mock-ticker.py --rate $${MOCK_RATE:-25000}
