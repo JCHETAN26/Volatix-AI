@@ -100,6 +100,16 @@ cpp-ingest: cpp-build  ## Stream a WebSocket and parse ticks (Ctrl-C to stop)
 cpp-throughput: cpp-build  ## Benchmark parser (Phase 2.2 acceptance: ≥20k tps)
 	./build/bin/chainguard --throughput-test $${THROUGHPUT_N:-1000000}
 
+.PHONY: cpp-engine
+cpp-engine: cpp-build  ## Full pipeline: WS → ring → features → Kafka topic 'financial-features'
+	./build/bin/chainguard --engine \
+		--ws-url $${WS_URL:-ws://localhost:8765/} \
+		--brokers $${KAFKA_BROKERS:-localhost:9092}
+
+.PHONY: cpp-feature-bench
+cpp-feature-bench: cpp-build  ## Frame-gen latency bench (Phase 2.3 acceptance: median <50µs)
+	./build/bin/chainguard --feature-bench
+
 .PHONY: mock-ticker
 mock-ticker:  ## Run the dev WebSocket ticker on ws://localhost:8765 (Ctrl-C to stop)
 	python3 scripts/mock-ticker.py --rate $${MOCK_RATE:-25000}
