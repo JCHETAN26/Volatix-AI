@@ -36,18 +36,10 @@ class MockChatLLM:
     def invoke(self, prompt: str | list[Any]) -> MockResponse:
         text = _coerce_prompt(prompt)
         lower = text.lower()
-        if "forensic investigator" in lower:
-            return MockResponse(
-                content=(
-                    "**Forensic Investigator (mock)**\n"
-                    "- RAG matches inspected; pattern resembles flash-loan "
-                    "imbalance.\n"
-                    "- No confirmed historical exemplar with similarity > 0.95.\n"
-                )
-            )
-        if "risk & compliance auditor" in lower or "risk and compliance" in lower:
-            # Echo a confidence in a parseable form — the auditor node strips
-            # it out via a regex match on `confidence=...`.
+        # Branch on the role-assignment line each template starts with —
+        # other phrases (e.g. "Forensic Investigator notes:") appear inside
+        # the auditor / enforcer prompts and would mis-route otherwise.
+        if "you are the **risk & compliance auditor**" in lower:
             score = _confidence_from_features(lower)
             return MockResponse(
                 content=(
@@ -56,12 +48,21 @@ class MockChatLLM:
                     f"- Recommendation: {'escalate' if score >= 0.95 else 'monitor'}.\n"
                 )
             )
-        if "settlement" in lower or "enforcer" in lower:
+        if "you are the **settlement & enforcer**" in lower:
             return MockResponse(
                 content=(
                     "**Settlement & Enforcer (mock)**\n"
                     "- Freeze instruction compiled.\n"
                     "- Audit trail captured.\n"
+                )
+            )
+        if "you are the **forensic investigator**" in lower:
+            return MockResponse(
+                content=(
+                    "**Forensic Investigator (mock)**\n"
+                    "- RAG matches inspected; pattern resembles flash-loan "
+                    "imbalance.\n"
+                    "- No confirmed historical exemplar with similarity > 0.95.\n"
                 )
             )
         return MockResponse(content="(mock LLM: no matching task header)")
