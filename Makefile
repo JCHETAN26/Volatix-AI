@@ -214,6 +214,45 @@ airflow-install:  ## helm install Apache Airflow (DAGs mounted from ConfigMap)
 airflow-ui:  ## Port-forward the Airflow webserver to localhost:8080
 	kubectl port-forward -n $${AIRFLOW_NAMESPACE:-airflow} svc/airflow-webserver 8080:8080
 
+# ---------------------------------------------------------------------------
+# Phase 4.2 — LangGraph 3-tier agent cluster
+# ---------------------------------------------------------------------------
+AGENTS_IMAGE_NAME ?= chainguard-agents
+AGENTS_IMAGE_TAG  ?= dev
+
+.PHONY: agents-test
+agents-test:  ## pytest the agents package (state schema + graph routing)
+	cd services/agents && PYTHONPATH=.. pytest -q tests
+
+.PHONY: agents-build
+agents-build:  ## Build the agents container image
+	docker build -f services/agents/Dockerfile \
+	    -t $(AGENTS_IMAGE_NAME):$(AGENTS_IMAGE_TAG) .
+
+.PHONY: agents-load
+agents-load: agents-build  ## Load the agents image into Minikube
+	minikube image load $(AGENTS_IMAGE_NAME):$(AGENTS_IMAGE_TAG)
+
+.PHONY: agents-seed
+agents-seed:  ## Seed Qdrant with attack-vector exemplars (port-forward-vector first)
+	PYTHONPATH=services python3 services/agents/seed_vector_db.py \
+	    --url $${QDRANT_URL:-http://localhost:6333}
+
+.PHONY: agents-deploy
+agents-deploy:  ## Apply k8s/agents-deployment.yaml
+	kubectl apply -f k8s/agents-deployment.yaml
+
+.PHONY: agents-undeploy
+agents-undeploy:  ## Remove the agents Deployment + ConfigMap + Secret
+	kubectl delete -f k8s/agents-deployment.yaml --ignore-not-found
+
+.PHONY: agents-set-openai-key
+agents-set-openai-key:  ## Inject OPENAI_API_KEY env into the Secret (reads $$OPENAI_API_KEY)
+	@test -n "$$OPENAI_API_KEY" || (echo "set OPENAI_API_KEY first" && exit 1)
+	kubectl create secret generic chainguard-agents-secrets \
+	    --from-literal=OPENAI_API_KEY=$$OPENAI_API_KEY \
+	    --dry-run=client -o yaml | kubectl apply -f -
+
 .PHONY: mock-ticker
 mock-ticker:  ## Run the dev WebSocket ticker on ws://localhost:8765 (Ctrl-C to stop)
 	python3 scripts/mock-ticker.py --rate $${MOCK_RATE:-25000}

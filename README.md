@@ -197,6 +197,23 @@ make classifier-test
 ```
 The classifier subscribes to `financial-features` (produced by the C++ engine), decodes each 64-byte FeatureFrame, runs LightGBM, and publishes the score on `anomaly-scores`. Frames + scores are mirrored into PostgreSQL (`feature_log`, `anomaly_score_log`) so the nightly Airflow DAG can retrain on real traffic via Purged K-Fold cross-validation.
 
+3-tier LangGraph agent cluster (Phase 4.2):
+```bash
+make port-forward-vector &
+make agents-seed                       # populate Qdrant attack_vectors collection
+# Optional — if you have an OpenAI API key, otherwise the service falls back
+# to a deterministic mock LLM so it doesn't crash-loop:
+OPENAI_API_KEY=sk-... make agents-set-openai-key
+make agents-load && make agents-deploy
+make agents-test                       # graph routing tests under MockChatLLM
+```
+The agents service consumes `anomaly-scores`, filters on `high_risk=true`, and routes each case through three nodes:
+1. **Forensic Investigator** — searches Qdrant `attack_vectors` for the closest historical exploit signatures.
+2. **Risk & Compliance Auditor** — fuses RAG evidence with the live features, emits a fraud confidence in `[0, 1]`.
+3. **Settlement & Enforcer** *(only when confidence ≥ 0.95)* — compiles a structured freeze instruction and a final markdown audit report.
+
+Every case (enforced or not) is persisted to PostgreSQL `agent_report` for the Phase 5 dashboard.
+
 ### 4. Launch the dashboard
 ```bash
 cd web
