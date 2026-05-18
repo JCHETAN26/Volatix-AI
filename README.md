@@ -133,6 +133,14 @@ make cpp-throughput                   # in-process benchmark; fails below 20k tp
 ```
 `make mock-ticker` accepts `MOCK_RATE=50000` and the underlying script supports `--inject-malformed N` (per 1000) to exercise the parser's degrade-gracefully path.
 
+Container image (Phase 3.1):
+```bash
+make docker-build     # multi-stage build → chainguard-core:dev
+make docker-size      # enforces the <150MB acceptance ceiling
+make docker-run       # docker run --rm chainguard-core:dev --version
+```
+The Dockerfile uses `debian:bookworm-slim` for the build stage and `gcr.io/distroless/cc-debian12:nonroot` for the runtime stage. Shared library deps are auto-resolved via `ldd` and copied into the final image; no shell, no package manager, runs as uid 65532 by default.
+
 Full feature pipeline (Phase 2.3):
 ```bash
 # end-to-end live: mock-ticker → engine → financial-features Kafka topic

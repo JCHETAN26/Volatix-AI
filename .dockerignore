@@ -1,0 +1,54 @@
+# ChainGuard-Core — docker build context filter.
+# Keep the build context tight: only CMake + src/ are needed for the image.
+
+# VCS / CI
+.git/
+.github/
+.gitignore
+.dockerignore
+
+# Build artifacts
+build/
+bin/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.exe
+
+# Tooling / docs
+README.md
+build-plan.md
+build-plan.txt
+Makefile
+LICENSE*
+
+# Subprojects not needed in the C++ engine image
+airflow/
+k8s/
+scripts/
+web/
+
+# Editor / OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Env / secrets — should never enter a container
+.env
+.env.*
+!.env.example
+
+# Python caches (from local dev)
+__pycache__/
+*.py[cod]
+.venv/
+venv/

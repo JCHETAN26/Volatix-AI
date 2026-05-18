@@ -24,6 +24,7 @@ jobs:
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
       cpp: ${{ steps.filter.outputs.cpp }}
+      docker: ${{ steps.filter.outputs.docker }}
     steps:
       - uses: actions/checkout@v4
       - id: filter
@@ -37,6 +38,12 @@ jobs:
               - 'src/**'
               - 'CMakeLists.txt'
               - '.clang-format'
+              - '.github/workflows/ci.yml'
+            docker:
+              - 'Dockerfile'
+              - '.dockerignore'
+              - 'src/**'
+              - 'CMakeLists.txt'
               - '.github/workflows/ci.yml'
 
   # ----------------------------------------------------------------------
@@ -135,11 +142,47 @@ jobs:
         run: ./build/bin/chainguard
 
   # ----------------------------------------------------------------------
+  # Container image — multi-stage Dockerfile, with a <150MB size gate
+  # enforcing the Phase 3.1 acceptance line.
+  # ----------------------------------------------------------------------
+  docker-ci:
+    needs: changes
+    if: needs.changes.outputs.docker == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          tags: chainguard-core:ci
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run --version smoke
+        run: docker run --rm chainguard-core:ci --version
+
+      - name: Enforce <150MB ceiling
+        run: |
+          bytes=$(docker image inspect chainguard-core:ci --format '{{.Size}}')
+          mb=$(( bytes / 1024 / 1024 ))
+          echo "image size: ${mb} MB"
+          if [ "${mb}" -ge 150 ]; then
+            echo "::error::image size ${mb}MB exceeds the 150MB Phase 3.1 ceiling"
+            exit 1
+          fi
+
+  # ----------------------------------------------------------------------
   # Aggregate gate — single required check for branch protection.
   # Passes only when every triggered job succeeded (or was skipped).
   # ----------------------------------------------------------------------
   ci:
-    needs: [frontend-ci, cpp-ci]
+    needs: [frontend-ci, cpp-ci, docker-ci]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -147,8 +190,9 @@ jobs:
         run: |
           fe='${{ needs.frontend-ci.result }}'
           cpp='${{ needs.cpp-ci.result }}'
-          echo "frontend-ci=$fe  cpp-ci=$cpp"
-          for r in "$fe" "$cpp"; do
+          dk='${{ needs.docker-ci.result }}'
+          echo "frontend-ci=$fe  cpp-ci=$cpp  docker-ci=$dk"
+          for r in "$fe" "$cpp" "$dk"; do
             if [ "$r" != "success" ] && [ "$r" != "skipped" ]; then
               echo "::error::A required CI job did not pass."
               exit 1
