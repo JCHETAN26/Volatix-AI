@@ -1,0 +1,153 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Phase 0.2 — dual-language CI.
+# - frontend-ci runs only when web/ changes (or when this workflow itself changes).
+# - cpp-ci runs only when src/ or CMake config changes.
+# Both jobs are required-status-check candidates for branch protection on main.
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ----------------------------------------------------------------------
+  # Path filtering — keeps PRs fast by skipping irrelevant jobs.
+  # ----------------------------------------------------------------------
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      cpp: ${{ steps.filter.outputs.cpp }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'web/**'
+              - '.github/workflows/ci.yml'
+            cpp:
+              - 'src/**'
+              - 'CMakeLists.txt'
+              - '.clang-format'
+              - '.github/workflows/ci.yml'
+
+  # ----------------------------------------------------------------------
+  # Frontend — Next.js 15 / pnpm.
+  # ----------------------------------------------------------------------
+  frontend-ci:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      # Detect first — setup-node's pnpm cache requires a lockfile that
+      # doesn't exist until Phase 5 scaffolds the Next.js app.
+      - name: Detect Next.js app
+        id: detect
+        run: |
+          if [ -f package.json ]; then
+            echo "scaffolded=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "scaffolded=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::web/ not scaffolded yet — skipping frontend-ci."
+          fi
+
+      - uses: pnpm/action-setup@v4
+        if: steps.detect.outputs.scaffolded == 'true'
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        if: steps.detect.outputs.scaffolded == 'true'
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install
+        if: steps.detect.outputs.scaffolded == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        if: steps.detect.outputs.scaffolded == 'true'
+        run: pnpm lint
+
+      - name: Typecheck
+        if: steps.detect.outputs.scaffolded == 'true'
+        run: pnpm typecheck
+
+      - name: Build
+        if: steps.detect.outputs.scaffolded == 'true'
+        run: pnpm build
+
+  # ----------------------------------------------------------------------
+  # C++20 engine — CMake + clang-format + zero-warning build.
+  # ----------------------------------------------------------------------
+  cpp-ci:
+    needs: changes
+    if: needs.changes.outputs.cpp == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain & dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            cmake \
+            ninja-build \
+            clang-format \
+            librdkafka-dev \
+            libssl-dev
+
+      - name: Verify clang-format
+        run: |
+          mapfile -t files < <(git ls-files '*.cpp' '*.hpp' '*.h' '*.cc' '*.cxx')
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "::notice::No C++ sources to format-check yet."
+            exit 0
+          fi
+          clang-format --dry-run --Werror "${files[@]}"
+
+      - name: Configure
+        run: cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build (-Wall -Wextra -Werror)
+        run: cmake --build build --parallel
+
+      - name: Smoke test binary
+        run: ./build/bin/chainguard
+
+  # ----------------------------------------------------------------------
+  # Aggregate gate — single required check for branch protection.
+  # Passes only when every triggered job succeeded (or was skipped).
+  # ----------------------------------------------------------------------
+  ci:
+    needs: [frontend-ci, cpp-ci]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify upstream jobs
+        run: |
+          fe='${{ needs.frontend-ci.result }}'
+          cpp='${{ needs.cpp-ci.result }}'
+          echo "frontend-ci=$fe  cpp-ci=$cpp"
+          for r in "$fe" "$cpp"; do
+            if [ "$r" != "success" ] && [ "$r" != "skipped" ]; then
+              echo "::error::A required CI job did not pass."
+              exit 1
+            fi
+          done

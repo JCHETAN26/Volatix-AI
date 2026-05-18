@@ -1,0 +1,43 @@
+# ChainGuard-Core C++ formatting rules.
+# Phase 0.2 — used by cpp-ci to enforce style on every PR.
+---
+Language: Cpp
+BasedOnStyle: Google
+Standard: c++20
+
+# Layout
+ColumnLimit: 100
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+AccessModifierOffset: -4
+
+# Braces & spacing
+BreakBeforeBraces: Attach
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+SpacesBeforeTrailingComments: 2
+
+# Includes — group: own header, system, third-party
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^<[^/.]+>$'      # C++ standard headers <vector>, <string>
+    Priority: 1
+  - Regex: '^<.*\.h>$'        # C system headers <sys/socket.h>
+    Priority: 2
+  - Regex: '^<.*>$'           # Other angle-bracket includes (boost, simdjson, librdkafka)
+    Priority: 3
+  - Regex: '^".*"$'           # Project headers
+    Priority: 4
+
+# Pointers / references stay against the type
+DerivePointerAlignment: false
+PointerAlignment: Left
+
+# Misc
+AlignAfterOpenBracket: Align
+BinPackArguments: false
+BinPackParameters: false
+AllowAllParametersOfDeclarationOnNextLine: false

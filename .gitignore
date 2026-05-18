@@ -1,0 +1,58 @@
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+.pnpm-store/
+*.tsbuildinfo
+.npmrc
+
+# --- C++ / CMake ---
+build/
+bin/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.exe
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# --- Env / Secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Editor / OS ---
+.DS_Store
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# --- Airflow ---
+airflow/logs/
+airflow/plugins/__pycache__/
+
+# --- Kubernetes ---
+k8s/secrets/
+*.kubeconfig
