@@ -43,8 +43,12 @@ public:
         }
     }
 
-    int delivered() const noexcept { return delivered_; }
-    int failed() const noexcept { return failed_; }
+    int delivered() const noexcept {
+        return delivered_;
+    }
+    int failed() const noexcept {
+        return failed_;
+    }
 
 private:
     int delivered_ = 0;
@@ -73,11 +77,15 @@ bool conf_set(RdKafka::Conf& conf, const std::string& key, RdKafka::DeliveryRepo
 std::unique_ptr<RdKafka::Producer> make_producer(const std::string& brokers,
                                                  RdKafka::DeliveryReportCb* dr_cb) {
     std::unique_ptr<RdKafka::Conf> conf(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
-    if (!conf_set(*conf, "bootstrap.servers", brokers)) return nullptr;
-    if (!conf_set(*conf, "client.id", "chainguard-core")) return nullptr;
+    if (!conf_set(*conf, "bootstrap.servers", brokers))
+        return nullptr;
+    if (!conf_set(*conf, "client.id", "chainguard-core"))
+        return nullptr;
     // 5s socket timeout keeps --probe responsive when nothing is listening.
-    if (!conf_set(*conf, "socket.timeout.ms", "5000")) return nullptr;
-    if (dr_cb && !conf_set(*conf, "dr_cb", dr_cb)) return nullptr;
+    if (!conf_set(*conf, "socket.timeout.ms", "5000"))
+        return nullptr;
+    if (dr_cb && !conf_set(*conf, "dr_cb", dr_cb))
+        return nullptr;
 
     std::string err;
     std::unique_ptr<RdKafka::Producer> producer(RdKafka::Producer::create(conf.get(), err));
@@ -92,12 +100,12 @@ int run_probe(const std::string& brokers) {
               << "  brokers: " << brokers << '\n';
 
     auto producer = make_producer(brokers, nullptr);
-    if (!producer) return EXIT_FAILURE;
+    if (!producer)
+        return EXIT_FAILURE;
 
     RdKafka::Metadata* raw_meta = nullptr;
-    const RdKafka::ErrorCode meta_err =
-        producer->metadata(/*all_topics=*/true, /*only_rkt=*/nullptr, &raw_meta,
-                           kMetadataTimeoutMs);
+    const RdKafka::ErrorCode meta_err = producer->metadata(
+        /*all_topics=*/true, /*only_rkt=*/nullptr, &raw_meta, kMetadataTimeoutMs);
     std::unique_ptr<RdKafka::Metadata> meta(raw_meta);
 
     if (meta_err != RdKafka::ERR_NO_ERROR) {
@@ -119,22 +127,22 @@ int run_smoke(const std::string& brokers) {
 
     DeliveryReportCb dr_cb;
     auto producer = make_producer(brokers, &dr_cb);
-    if (!producer) return EXIT_FAILURE;
+    if (!producer)
+        return EXIT_FAILURE;
 
     for (int i = 0; i < kSmokeMessageCount; ++i) {
         std::string payload = "chainguard-smoke-" + std::to_string(i);
-        const RdKafka::ErrorCode produce_err = producer->produce(
-            kSmokeTopic,
-            RdKafka::Topic::PARTITION_UA,
-            RdKafka::Producer::RK_MSG_COPY,
-            payload.data(),
-            payload.size(),
-            /*key=*/nullptr, /*key_len=*/0,
-            /*timestamp=*/0,
-            /*msg_opaque=*/nullptr);
+        const RdKafka::ErrorCode produce_err = producer->produce(kSmokeTopic,
+                                                                 RdKafka::Topic::PARTITION_UA,
+                                                                 RdKafka::Producer::RK_MSG_COPY,
+                                                                 payload.data(),
+                                                                 payload.size(),
+                                                                 /*key=*/nullptr,
+                                                                 /*key_len=*/0,
+                                                                 /*timestamp=*/0,
+                                                                 /*msg_opaque=*/nullptr);
         if (produce_err != RdKafka::ERR_NO_ERROR) {
-            std::cerr << "produce[" << i << "] failed: "
-                      << RdKafka::err2str(produce_err) << '\n';
+            std::cerr << "produce[" << i << "] failed: " << RdKafka::err2str(produce_err) << '\n';
             return EXIT_FAILURE;
         }
         producer->poll(0);
@@ -155,17 +163,16 @@ int run_smoke(const std::string& brokers) {
 }
 
 void print_usage(const char* argv0) {
-    std::cout
-        << "Usage: " << argv0 << " [options]\n"
-        << "  --brokers HOST:PORT[,HOST:PORT...]   Kafka bootstrap servers\n"
-        << "                                       (default: " << kDefaultBrokers << ",\n"
-        << "                                        env: KAFKA_BROKERS)\n"
-        << "  --probe                              Verify broker connection via metadata\n"
-        << "  --smoke                              Produce " << kSmokeMessageCount
-        << " records to '" << kSmokeTopic << "' and\n"
-        << "                                       verify zero delivery failures\n"
-        << "  --version                            Print version and exit\n"
-        << "  -h, --help                           Print this help and exit\n";
+    std::cout << "Usage: " << argv0 << " [options]\n"
+              << "  --brokers HOST:PORT[,HOST:PORT...]   Kafka bootstrap servers\n"
+              << "                                       (default: " << kDefaultBrokers << ",\n"
+              << "                                        env: KAFKA_BROKERS)\n"
+              << "  --probe                              Verify broker connection via metadata\n"
+              << "  --smoke                              Produce " << kSmokeMessageCount
+              << " records to '" << kSmokeTopic << "' and\n"
+              << "                                       verify zero delivery failures\n"
+              << "  --version                            Print version and exit\n"
+              << "  -h, --help                           Print this help and exit\n";
 }
 
 }  // namespace chainguard
