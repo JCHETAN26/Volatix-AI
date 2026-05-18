@@ -133,6 +133,18 @@ make cpp-throughput                   # in-process benchmark; fails below 20k tp
 ```
 `make mock-ticker` accepts `MOCK_RATE=50000` and the underlying script supports `--inject-malformed N` (per 1000) to exercise the parser's degrade-gracefully path.
 
+Full feature pipeline (Phase 2.3):
+```bash
+# end-to-end live: mock-ticker → engine → financial-features Kafka topic
+make port-forward-kafka &             # terminal 1
+make mock-ticker &                    # terminal 2
+make cpp-engine                       # terminal 3: pushes FeatureFrame to Kafka
+
+# microbench: frame-gen latency
+make cpp-feature-bench                # fails if median ≥ 50µs
+```
+Architecture: WebSocket producer thread parses JSON ticks with simdjson and pushes them into an SPSC lock-free ring (64k slots, cache-line-padded indices, zero mutexes in the hot path). A consumer thread pops, updates the OFI (16-bucket time-windowed) and Realized Volatility (rolling stddev of log returns) kernels, and every N ticks publishes a 64-byte trivially-copyable `FeatureFrame` to the `financial-features` Kafka topic for downstream LightGBM consumption (Phase 4).
+
 System dependencies (Ubuntu):
 ```bash
 sudo apt-get install -y build-essential cmake ninja-build pkg-config \

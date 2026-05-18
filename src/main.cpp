@@ -4,8 +4,9 @@
 // Phase 2.2: --ingest streams JSON ticks off a WebSocket and parses them
 //            with simdjson; --throughput-test benchmarks the parser in
 //            isolation (drives the 20,000+ ticks/sec acceptance line).
-// Phase 2.3 will wire the parsed ticks into a lock-free ring buffer and
-// the OFI / Realized-Volatility feature kernels.
+// Phase 2.3: --engine wires the full WebSocket → SPSC ring → OFI/RV
+//            kernels → FeatureFrame → Kafka pipeline. --feature-bench
+//            enforces the <50µs frame-generation acceptance ceiling.
 
 #include <atomic>
 #include <chrono>
@@ -24,12 +25,14 @@
 // so this prefixed form is the portable one.
 #include <librdkafka/rdkafkacpp.h>
 
+#include "engine.hpp"
+#include "feature_frame.hpp"
 #include "tick_parser.hpp"
 #include "ws_client.hpp"
 
 namespace chainguard {
 
-constexpr const char* kVersion = "0.2.0";
+constexpr const char* kVersion = "0.3.0";
 constexpr const char* kDefaultBrokers = "localhost:9092";
 constexpr const char* kDefaultWsUrl = "ws://localhost:8765/";
 constexpr const char* kSmokeTopic = "chainguard.smoke";
@@ -37,6 +40,11 @@ constexpr int kSmokeMessageCount = 10;
 constexpr int kFlushTimeoutMs = 10'000;
 constexpr int kMetadataTimeoutMs = 5'000;
 constexpr int kDefaultThroughputCount = 1'000'000;
+constexpr std::int64_t kDefaultOfiBucketNs = 100'000'000;  // 100ms × 16 = 1.6s window
+constexpr std::size_t kDefaultRvSamples = 100;
+constexpr std::uint32_t kDefaultFrameIntervalTicks = 100;
+constexpr int kDefaultBenchPrefillTicks = 1024;
+constexpr int kDefaultBenchFrameIterations = 100'000;
 
 // Counts delivery acks so --smoke can fail when any message is dropped.
 class DeliveryReportCb : public RdKafka::DeliveryReportCb {
@@ -314,6 +322,15 @@ void print_usage(const char* argv0) {
               << "  --throughput-test [N]               Benchmark parser on N synthetic\n"
               << "                                      ticks (default: " << kDefaultThroughputCount
               << ")\n"
+              << "  --engine                            Run full pipeline: WS → SPSC ring →\n"
+              << "                                      OFI/RV → Kafka topic '"
+              << kFinancialFeaturesTopic << "'\n"
+              << "  --feature-bench [P [F]]             Bench frame-gen latency. P = prefill\n"
+              << "                                      ticks (default: "
+              << kDefaultBenchPrefillTicks << "), F = frame\n"
+              << "                                      iterations (default: "
+              << kDefaultBenchFrameIterations << ").\n"
+              << "                                      Fails if median ≥ 50µs.\n"
               << "  --version                           Print version and exit\n"
               << "  -h, --help                          Print this help and exit\n";
 }
@@ -326,6 +343,8 @@ int main(int argc, char** argv) {
     std::string brokers = kDefaultBrokers;
     std::string ws_url = kDefaultWsUrl;
     int throughput_count = kDefaultThroughputCount;
+    int bench_prefill = kDefaultBenchPrefillTicks;
+    int bench_iterations = kDefaultBenchFrameIterations;
 
     if (const char* env = std::getenv("KAFKA_BROKERS"); env && *env) {
         brokers = env;
@@ -334,7 +353,7 @@ int main(int argc, char** argv) {
         ws_url = env;
     }
 
-    enum class Mode { Default, Probe, Smoke, Ingest, Throughput };
+    enum class Mode { Default, Probe, Smoke, Ingest, Throughput, Engine, Bench };
     Mode mode = Mode::Default;
 
     for (int i = 1; i < argc; ++i) {
@@ -355,6 +374,24 @@ int main(int argc, char** argv) {
                 throughput_count = std::atoi(argv[++i]);
                 if (throughput_count <= 0) {
                     std::cerr << "throughput-test count must be > 0\n";
+                    return EXIT_FAILURE;
+                }
+            }
+        } else if (arg == "--engine") {
+            mode = Mode::Engine;
+        } else if (arg == "--feature-bench") {
+            mode = Mode::Bench;
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                bench_prefill = std::atoi(argv[++i]);
+                if (bench_prefill <= 0) {
+                    std::cerr << "feature-bench prefill must be > 0\n";
+                    return EXIT_FAILURE;
+                }
+            }
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                bench_iterations = std::atoi(argv[++i]);
+                if (bench_iterations <= 0) {
+                    std::cerr << "feature-bench iterations must be > 0\n";
                     return EXIT_FAILURE;
                 }
             }
@@ -380,10 +417,24 @@ int main(int argc, char** argv) {
             return run_ingest(ws_url);
         case Mode::Throughput:
             return run_throughput_test(throughput_count);
+        case Mode::Engine: {
+            EngineConfig cfg{
+                .ws_url = ws_url,
+                .brokers = brokers,
+                .topic = kFinancialFeaturesTopic,
+                .ofi_bucket_width_ns = kDefaultOfiBucketNs,
+                .rv_samples = kDefaultRvSamples,
+                .frame_interval_ticks = kDefaultFrameIntervalTicks,
+            };
+            return run_engine(cfg);
+        }
+        case Mode::Bench:
+            return run_feature_bench(bench_prefill, bench_iterations);
         case Mode::Default:
             // No args: build smoke-test (used by CI). Must not contact Kafka.
-            std::cout << "chainguard " << kVersion << " — Phase 2.2 build OK\n"
+            std::cout << "chainguard " << kVersion << " — Phase 2.3 build OK\n"
                       << "  Modes: --probe | --smoke | --ingest | --throughput-test\n"
+                      << "         --engine | --feature-bench\n"
                       << "  Default brokers: " << brokers << '\n'
                       << "  Default ws-url:  " << ws_url << '\n';
             return EXIT_SUCCESS;

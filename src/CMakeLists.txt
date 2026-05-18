@@ -1,11 +1,13 @@
 # --- src/CMakeLists.txt ---------------------------------------------------
-# Phase 2.2: adds the WebSocket ingest path (Boost.Beast) and SIMD JSON
-# parsing (simdjson). Phase 2.3 will add the lock-free ring buffer + the
-# Order Flow Imbalance / Realized Volatility kernels.
+# Phase 2.3: completes the C++ engine — adds the SPSC lock-free ring,
+# OFI / Realized-Volatility kernels, FeatureFrame serializer, and the
+# engine pipeline that broadcasts to the `financial-features` Kafka topic.
 # --------------------------------------------------------------------------
 
 add_executable(chainguard
     main.cpp
+    engine.cpp
+    features.cpp
     tick_parser.cpp
     ws_client.cpp
 )
