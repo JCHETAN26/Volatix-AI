@@ -250,6 +250,85 @@ int run_engine(const EngineConfig& cfg) {
     return EXIT_SUCCESS;
 }
 
+int run_consume(const std::string& brokers, const std::string& topic, const std::string& group) {
+    std::unique_ptr<RdKafka::Conf> conf(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
+    if (!conf_set(*conf, "bootstrap.servers", brokers))
+        return EXIT_FAILURE;
+    if (!conf_set(*conf, "group.id", group))
+        return EXIT_FAILURE;
+    if (!conf_set(*conf, "auto.offset.reset", "earliest"))
+        return EXIT_FAILURE;
+    if (!conf_set(*conf, "enable.auto.commit", "true"))
+        return EXIT_FAILURE;
+    if (!conf_set(*conf, "socket.timeout.ms", "5000"))
+        return EXIT_FAILURE;
+
+    std::string err;
+    std::unique_ptr<RdKafka::KafkaConsumer> consumer(
+        RdKafka::KafkaConsumer::create(conf.get(), err));
+    if (!consumer) {
+        std::cerr << "failed to create consumer: " << err << '\n';
+        return EXIT_FAILURE;
+    }
+
+    const std::vector<std::string> topics{topic};
+    if (const auto sub_err = consumer->subscribe(topics); sub_err != RdKafka::ERR_NO_ERROR) {
+        std::cerr << "subscribe failed: " << RdKafka::err2str(sub_err) << '\n';
+        return EXIT_FAILURE;
+    }
+
+    std::atomic<bool> shutdown{false};
+    g_engine_shutdown = &shutdown;
+    std::signal(SIGINT, engine_signal_handler);
+    std::signal(SIGTERM, engine_signal_handler);
+
+    std::atomic<std::uint64_t> consumed{0};
+
+    std::cout << "chainguard consume\n"
+              << "  brokers: " << brokers << '\n'
+              << "  topic:   " << topic << '\n'
+              << "  group:   " << group << '\n';
+
+    std::thread reporter([&]() {
+        std::uint64_t last = 0;
+        auto last_t = std::chrono::steady_clock::now();
+        while (!shutdown.load(std::memory_order_acquire)) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            const auto now = std::chrono::steady_clock::now();
+            const auto c = consumed.load(std::memory_order_relaxed);
+            const double dt = std::chrono::duration<double>(now - last_t).count();
+            const double rate = dt > 0.0 ? static_cast<double>(c - last) / dt : 0.0;
+            std::printf(
+                "  consumed=%llu  rate=%.0f msgs/sec\n", static_cast<unsigned long long>(c), rate);
+            std::fflush(stdout);
+            last = c;
+            last_t = now;
+        }
+    });
+
+    while (!shutdown.load(std::memory_order_acquire)) {
+        std::unique_ptr<RdKafka::Message> msg(consumer->consume(1000));
+        switch (msg->err()) {
+            case RdKafka::ERR_NO_ERROR:
+                consumed.fetch_add(1, std::memory_order_relaxed);
+                break;
+            case RdKafka::ERR__TIMED_OUT:
+            case RdKafka::ERR__PARTITION_EOF:
+                // benign — keep polling
+                break;
+            default:
+                std::cerr << "consume error: " << msg->errstr() << '\n';
+                break;
+        }
+    }
+
+    reporter.join();
+    consumer->close();
+
+    std::cout << "  → consumed=" << consumed.load() << '\n';
+    return EXIT_SUCCESS;
+}
+
 int run_feature_bench(int prefill_ticks, int frame_iterations) {
     if (prefill_ticks <= 0)
         prefill_ticks = 1024;

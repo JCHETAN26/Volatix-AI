@@ -38,4 +38,10 @@ int run_engine(const EngineConfig& cfg);
 // acceptance bar.
 int run_feature_bench(int prefill_ticks, int frame_iterations);
 
+// Phase 3.2. Lightweight Kafka consumer: subscribes to `topic` under
+// consumer group `group`, polls, increments a counter, prints rate every
+// second. Its only job is to give KEDA a real consumer-group lag signal
+// to scale the chainguard Deployment on.
+int run_consume(const std::string& brokers, const std::string& topic, const std::string& group);
+
 }  // namespace chainguard

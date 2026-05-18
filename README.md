@@ -141,6 +141,20 @@ make docker-run       # docker run --rm chainguard-core:dev --version
 ```
 The Dockerfile uses `debian:bookworm-slim` for the build stage and `gcr.io/distroless/cc-debian12:nonroot` for the runtime stage. Shared library deps are auto-resolved via `ldd` and copied into the final image; no shell, no package manager, runs as uid 65532 by default.
 
+Kubernetes + KEDA (Phase 3.2):
+```bash
+make image-load       # docker-build + minikube image load chainguard-core:dev
+make keda-install     # helm install kedacore/keda into the keda namespace
+make k8s-deploy       # apply k8s/deployment.yaml + k8s/keda-scaledobject.yaml
+make watch-pods       # tail replicas + the KEDA-managed HPA
+
+# Acceptance: flood raw-ticks with 50k records, watch the Deployment scale 1 → 5
+make flood-kafka      # ephemeral kafka-console-producer pod, 50,000 messages
+                      # KEDA sees lag ≥ 50k, lagThreshold=10k → desired = 5 replicas
+                      # once chainguard-engine drains the backlog, replicas → 1
+```
+The Deployment runs `chainguard --consume raw-ticks --group chainguard-engine` so KEDA has a real consumer-group lag to scale on. The ScaledObject's kafka trigger polls every 10s and uses a 60s scale-down cooldown.
+
 Full feature pipeline (Phase 2.3):
 ```bash
 # end-to-end live: mock-ticker → engine → financial-features Kafka topic
