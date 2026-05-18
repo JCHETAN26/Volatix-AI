@@ -52,17 +52,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-          cache-dependency-path: web/pnpm-lock.yaml
-
-      # Skip cleanly when the web/ app hasn't been scaffolded yet (pre-Phase 5).
+      # Detect first — setup-node's pnpm cache requires a lockfile that
+      # doesn't exist until Phase 5 scaffolds the Next.js app.
       - name: Detect Next.js app
         id: detect
         run: |
@@ -72,6 +63,18 @@ jobs:
             echo "scaffolded=false" >> "$GITHUB_OUTPUT"
             echo "::notice::web/ not scaffolded yet — skipping frontend-ci."
           fi
+
+      - uses: pnpm/action-setup@v4
+        if: steps.detect.outputs.scaffolded == 'true'
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        if: steps.detect.outputs.scaffolded == 'true'
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: web/pnpm-lock.yaml
 
       - name: Install
         if: steps.detect.outputs.scaffolded == 'true'
