@@ -101,17 +101,21 @@ helm version
 
 ### 1. Bootstrap local infrastructure
 ```bash
-minikube start --cpus=4 --memory=8192
-helm install chain-kafka bitnami/kafka --set listeners.client.protocol=PLAINTEXT
-helm install chain-db    bitnami/postgresql
-kubectl apply -f k8s/vector-db.yaml
+make infra-up        # minikube + chain-kafka + chain-db + vector-db (Qdrant)
+make pods            # sanity-check Running state
+make validate        # PostgreSQL SELECT + Qdrant create/get/delete a test collection
+```
+Under the hood: `scripts/bootstrap-infra.sh` runs `minikube start --cpus=4 --memory=8192`, installs the Bitnami Helm charts for Kafka and PostgreSQL, and applies `k8s/vector-db.yaml`.
+
+For validating the vector DB you need a port-forward in another terminal:
+```bash
+make port-forward-vector   # exposes localhost:6333 (HTTP) + 6334 (gRPC)
 ```
 
 ### 2. Build the C++ engine
 ```bash
-cmake -B build -S .
-cmake --build build
-./build/chainguard
+make cpp-build       # cmake configure + build
+make cpp-run         # build + execute
 ```
 
 ### 3. Run the analytics & agent stack
@@ -131,6 +135,13 @@ airflow dags trigger retraining_pipeline
 cd web
 pnpm install
 pnpm dev
+```
+
+### Teardown
+```bash
+make infra-down      # remove helm releases + vector-db (cluster keeps running)
+make infra-stop      # the above + `minikube stop`
+make infra-nuke      # DESTRUCTIVE: `minikube delete`
 ```
 
 ---
