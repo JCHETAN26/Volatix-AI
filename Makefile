@@ -81,8 +81,16 @@ cpp-build:  ## Configure + build the C++ engine
 	cmake --build build --parallel
 
 .PHONY: cpp-run
-cpp-run: cpp-build  ## Run the chainguard binary
+cpp-run: cpp-build  ## Run the chainguard binary (no-op build smoke)
 	./build/bin/chainguard
+
+.PHONY: cpp-probe
+cpp-probe: cpp-build  ## Verify Kafka broker connectivity (needs port-forward-kafka)
+	./build/bin/chainguard --probe --brokers $${KAFKA_BROKERS:-localhost:9092}
+
+.PHONY: cpp-smoke
+cpp-smoke: cpp-build  ## Produce 10 records and verify zero drops (Phase 2.1 acceptance)
+	./build/bin/chainguard --smoke --brokers $${KAFKA_BROKERS:-localhost:9092}
 
 .PHONY: cpp-clean
 cpp-clean:  ## Remove the local CMake build directory
