@@ -112,7 +112,9 @@ jobs:
             pkg-config \
             clang-format \
             librdkafka-dev \
-            libssl-dev
+            libssl-dev \
+            libboost-system-dev \
+            libsimdjson-dev
 
       - name: Verify clang-format
         run: |

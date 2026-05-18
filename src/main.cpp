@@ -1,35 +1,42 @@
 // ChainGuard-Core — Ingestion & Feature Engineering Engine
 //
-// Phase 2.1: minimal native Kafka producer.
-//   * `--probe`  → request broker metadata; verifies the connection without
-//                  emitting any records (safe in CI without Kafka — see main).
-//   * `--smoke`  → produce N records to a dedicated smoke topic and validate
-//                  that every one of them was acknowledged with no errors,
-//                  satisfying the "verified test link ... without packet
-//                  drops" acceptance line for Task 2.1.
-//
-// Phase 2.2 replaces the smoke loop with the real Boost.Beast WebSocket
-// ingester feeding simdjson-parsed TickData structs into the producer.
+// Phase 2.1: native Kafka producer with --probe / --smoke modes.
+// Phase 2.2: --ingest streams JSON ticks off a WebSocket and parses them
+//            with simdjson; --throughput-test benchmarks the parser in
+//            isolation (drives the 20,000+ ticks/sec acceptance line).
+// Phase 2.3 will wire the parsed ticks into a lock-free ring buffer and
+// the OFI / Realized-Volatility feature kernels.
 
+#include <atomic>
+#include <chrono>
+#include <csignal>
+#include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <thread>
+#include <vector>
 
 // Both Ubuntu (librdkafka-dev) and Homebrew install the C++ headers under a
 // `librdkafka/` subdirectory of the include prefix that pkg-config exposes,
 // so this prefixed form is the portable one.
 #include <librdkafka/rdkafkacpp.h>
 
+#include "tick_parser.hpp"
+#include "ws_client.hpp"
+
 namespace chainguard {
 
-constexpr const char* kVersion = "0.1.0";
+constexpr const char* kVersion = "0.2.0";
 constexpr const char* kDefaultBrokers = "localhost:9092";
+constexpr const char* kDefaultWsUrl = "ws://localhost:8765/";
 constexpr const char* kSmokeTopic = "chainguard.smoke";
 constexpr int kSmokeMessageCount = 10;
 constexpr int kFlushTimeoutMs = 10'000;
 constexpr int kMetadataTimeoutMs = 5'000;
+constexpr int kDefaultThroughputCount = 1'000'000;
 
 // Counts delivery acks so --smoke can fail when any message is dropped.
 class DeliveryReportCb : public RdKafka::DeliveryReportCb {
@@ -162,17 +169,153 @@ int run_smoke(const std::string& brokers) {
     return EXIT_SUCCESS;
 }
 
+// ---------------------------------------------------------------------------
+// Phase 2.2 — WebSocket ingest
+// ---------------------------------------------------------------------------
+
+namespace {
+std::atomic<bool>* g_shutdown_flag = nullptr;
+void shutdown_signal(int) noexcept {
+    if (g_shutdown_flag) {
+        g_shutdown_flag->store(true, std::memory_order_release);
+    }
+}
+}  // namespace
+
+int run_ingest(const std::string& ws_url) {
+    WsTarget target;
+    if (!parse_ws_url(ws_url, target)) {
+        std::cerr << "invalid WebSocket URL: " << ws_url << '\n';
+        return EXIT_FAILURE;
+    }
+
+    std::cout << "chainguard " << kVersion << " — ingest\n"
+              << "  url:    " << ws_url << '\n'
+              << "  host:   " << target.host << ":" << target.port << target.path << '\n'
+              << "  tls:    " << (target.tls ? "yes" : "no") << '\n';
+
+    TickParser parser;
+    std::atomic<bool> shutdown{false};
+    g_shutdown_flag = &shutdown;
+    std::signal(SIGINT, shutdown_signal);
+    std::signal(SIGTERM, shutdown_signal);
+
+    std::unique_ptr<WsClient> client;
+    auto on_message = [&](std::string_view payload) {
+        parser.parse(payload);
+        if (shutdown.load(std::memory_order_acquire) && client) {
+            client->stop();
+        }
+    };
+
+    client = std::make_unique<WsClient>(target, on_message);
+
+    const auto start = std::chrono::steady_clock::now();
+    std::uint64_t last_ok = 0;
+    auto last_tick = start;
+
+    // Reporter thread: prints throughput every second until shutdown.
+    std::thread reporter([&]() {
+        while (!shutdown.load(std::memory_order_acquire)) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            const auto now = std::chrono::steady_clock::now();
+            const std::uint64_t ok = parser.parsed_ok();
+            const std::uint64_t rej = parser.parsed_rejected();
+            const auto dt = std::chrono::duration<double>(now - last_tick).count();
+            const double rate = dt > 0.0 ? static_cast<double>(ok - last_ok) / dt : 0.0;
+            std::printf("  parsed=%llu  rejected=%llu  rate=%.0f tps\n",
+                        static_cast<unsigned long long>(ok),
+                        static_cast<unsigned long long>(rej),
+                        rate);
+            std::fflush(stdout);
+            last_ok = ok;
+            last_tick = now;
+        }
+    });
+
+    try {
+        client->run();
+    } catch (const std::exception& ex) {
+        std::cerr << "ingest error: " << ex.what() << '\n';
+        shutdown.store(true, std::memory_order_release);
+        reporter.join();
+        return EXIT_FAILURE;
+    }
+
+    shutdown.store(true, std::memory_order_release);
+    reporter.join();
+    std::cout << "  → stopped. parsed=" << parser.parsed_ok()
+              << " rejected=" << parser.parsed_rejected() << '\n';
+    return EXIT_SUCCESS;
+}
+
+int run_throughput_test(int count) {
+    std::cout << "chainguard " << kVersion << " — throughput test\n"
+              << "  payloads: " << count << '\n';
+
+    // Synthesize one payload per loop iteration so we exercise the parser
+    // exclusively (no I/O). Numbers are kept deterministic so reviewers can
+    // diff runs.
+    std::vector<std::string> corpus;
+    corpus.reserve(static_cast<std::size_t>(count));
+    for (int i = 0; i < count; ++i) {
+        const double price = 100.0 + static_cast<double>(i % 5000) * 0.01;
+        const int size_shares = 100 + (i % 500);
+        const std::int64_t ts_ns = 1'715'923'812'345'000'000LL + static_cast<std::int64_t>(i);
+        char buf[160];
+        const int n = std::snprintf(buf,
+                                    sizeof(buf),
+                                    R"({"sym":"AAPL","t":%lld,"p":%.2f,"s":%d,"side":"%c"})",
+                                    static_cast<long long>(ts_ns),
+                                    price,
+                                    size_shares,
+                                    (i & 1) ? 'B' : 'S');
+        corpus.emplace_back(buf, static_cast<std::size_t>(n));
+    }
+
+    TickParser parser;
+    const auto t0 = std::chrono::steady_clock::now();
+    for (const auto& payload : corpus) {
+        parser.parse(payload);
+    }
+    const auto t1 = std::chrono::steady_clock::now();
+
+    const auto secs = std::chrono::duration<double>(t1 - t0).count();
+    const double rate = secs > 0.0 ? static_cast<double>(corpus.size()) / secs : 0.0;
+    std::cout << "  elapsed: " << secs << " s\n"
+              << "  parsed_ok:    " << parser.parsed_ok() << '\n'
+              << "  parsed_reject:" << parser.parsed_rejected() << '\n'
+              << "  throughput:   " << static_cast<long long>(rate) << " ticks/sec\n";
+
+    // Phase 2.2 acceptance: 20,000+ tick payloads per second.
+    constexpr double kAcceptanceFloor = 20'000.0;
+    if (rate < kAcceptanceFloor) {
+        std::cerr << "  → BELOW acceptance floor of " << kAcceptanceFloor << " tps\n";
+        return EXIT_FAILURE;
+    }
+    std::cout << "  → meets acceptance (≥ " << kAcceptanceFloor << " tps)\n";
+    return EXIT_SUCCESS;
+}
+
 void print_usage(const char* argv0) {
     std::cout << "Usage: " << argv0 << " [options]\n"
-              << "  --brokers HOST:PORT[,HOST:PORT...]   Kafka bootstrap servers\n"
-              << "                                       (default: " << kDefaultBrokers << ",\n"
-              << "                                        env: KAFKA_BROKERS)\n"
-              << "  --probe                              Verify broker connection via metadata\n"
-              << "  --smoke                              Produce " << kSmokeMessageCount
+              << "  --brokers HOST:PORT[,HOST:PORT...]  Kafka bootstrap servers\n"
+              << "                                      (default: " << kDefaultBrokers
+              << ", env: KAFKA_BROKERS)\n"
+              << "  --probe                             Verify broker connection via metadata\n"
+              << "  --smoke                             Produce " << kSmokeMessageCount
               << " records to '" << kSmokeTopic << "' and\n"
-              << "                                       verify zero delivery failures\n"
-              << "  --version                            Print version and exit\n"
-              << "  -h, --help                           Print this help and exit\n";
+              << "                                      verify zero delivery failures\n"
+              << "  --ingest                            Stream a WebSocket and parse ticks\n"
+              << "                                      via simdjson (Ctrl-C to stop)\n"
+              << "  --ws-url URL                        WebSocket endpoint for --ingest\n"
+              << "                                      (default: " << kDefaultWsUrl
+              << ", env: WS_URL)\n"
+              << "  --throughput-test [N]               Benchmark parser on N synthetic\n"
+              << "                                      ticks (default: " << kDefaultThroughputCount
+              << ")\n"
+              << "  --version                           Print version and exit\n"
+              << "  -h, --help                          Print this help and exit\n";
 }
 
 }  // namespace chainguard
@@ -181,21 +324,40 @@ int main(int argc, char** argv) {
     using namespace chainguard;
 
     std::string brokers = kDefaultBrokers;
+    std::string ws_url = kDefaultWsUrl;
+    int throughput_count = kDefaultThroughputCount;
+
     if (const char* env = std::getenv("KAFKA_BROKERS"); env && *env) {
         brokers = env;
     }
+    if (const char* env = std::getenv("WS_URL"); env && *env) {
+        ws_url = env;
+    }
 
-    enum class Mode { Default, Probe, Smoke };
+    enum class Mode { Default, Probe, Smoke, Ingest, Throughput };
     Mode mode = Mode::Default;
 
     for (int i = 1; i < argc; ++i) {
         const std::string_view arg = argv[i];
         if (arg == "--brokers" && i + 1 < argc) {
             brokers = argv[++i];
+        } else if (arg == "--ws-url" && i + 1 < argc) {
+            ws_url = argv[++i];
         } else if (arg == "--probe") {
             mode = Mode::Probe;
         } else if (arg == "--smoke") {
             mode = Mode::Smoke;
+        } else if (arg == "--ingest") {
+            mode = Mode::Ingest;
+        } else if (arg == "--throughput-test") {
+            mode = Mode::Throughput;
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                throughput_count = std::atoi(argv[++i]);
+                if (throughput_count <= 0) {
+                    std::cerr << "throughput-test count must be > 0\n";
+                    return EXIT_FAILURE;
+                }
+            }
         } else if (arg == "--version") {
             std::cout << "chainguard " << kVersion << '\n';
             return EXIT_SUCCESS;
@@ -214,11 +376,16 @@ int main(int argc, char** argv) {
             return run_probe(brokers);
         case Mode::Smoke:
             return run_smoke(brokers);
+        case Mode::Ingest:
+            return run_ingest(ws_url);
+        case Mode::Throughput:
+            return run_throughput_test(throughput_count);
         case Mode::Default:
             // No args: build smoke-test (used by CI). Must not contact Kafka.
-            std::cout << "chainguard " << kVersion << " — Phase 2.1 build OK\n"
-                      << "  Run with --probe or --smoke against a running broker.\n"
-                      << "  Default brokers: " << brokers << '\n';
+            std::cout << "chainguard " << kVersion << " — Phase 2.2 build OK\n"
+                      << "  Modes: --probe | --smoke | --ingest | --throughput-test\n"
+                      << "  Default brokers: " << brokers << '\n'
+                      << "  Default ws-url:  " << ws_url << '\n';
             return EXIT_SUCCESS;
     }
     return EXIT_SUCCESS;

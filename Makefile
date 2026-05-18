@@ -92,6 +92,18 @@ cpp-probe: cpp-build  ## Verify Kafka broker connectivity (needs port-forward-ka
 cpp-smoke: cpp-build  ## Produce 10 records and verify zero drops (Phase 2.1 acceptance)
 	./build/bin/chainguard --smoke --brokers $${KAFKA_BROKERS:-localhost:9092}
 
+.PHONY: cpp-ingest
+cpp-ingest: cpp-build  ## Stream a WebSocket and parse ticks (Ctrl-C to stop)
+	./build/bin/chainguard --ingest --ws-url $${WS_URL:-ws://localhost:8765/}
+
+.PHONY: cpp-throughput
+cpp-throughput: cpp-build  ## Benchmark parser (Phase 2.2 acceptance: ≥20k tps)
+	./build/bin/chainguard --throughput-test $${THROUGHPUT_N:-1000000}
+
+.PHONY: mock-ticker
+mock-ticker:  ## Run the dev WebSocket ticker on ws://localhost:8765 (Ctrl-C to stop)
+	python3 scripts/mock-ticker.py --rate $${MOCK_RATE:-25000}
+
 .PHONY: cpp-clean
 cpp-clean:  ## Remove the local CMake build directory
 	rm -rf build
