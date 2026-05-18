@@ -1,0 +1,33 @@
+# ChainGuard-Core — KEDA ScaledObject (Phase 3 / Task 3.2).
+#
+# Scales the chainguard-engine Deployment based on consumer-group lag on
+# the raw-ticks topic. With lagThreshold=10000 and 50,000 backlogged
+# records (the build-plan acceptance scenario), KEDA's kafka scaler will
+# compute desired = ceil(50000 / 10000) = 5 replicas and the HPA scales
+# the Deployment from 1 → 5. When the consumer drains the backlog the
+# pollingInterval recheck brings replicas back to minReplicaCount.
+
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: chainguard-engine
+  labels:
+    app.kubernetes.io/name: chainguard-engine
+    app.kubernetes.io/component: autoscaler
+    app.kubernetes.io/part-of: chainguard-core
+spec:
+  scaleTargetRef:
+    name: chainguard-engine
+  pollingInterval: 10  # seconds between lag samples
+  cooldownPeriod: 60   # wait 60s of below-threshold before scaling down
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  triggers:
+    - type: kafka
+      metadata:
+        bootstrapServers: chain-kafka.default.svc.cluster.local:9092
+        consumerGroup: chainguard-engine
+        topic: raw-ticks
+        lagThreshold: "10000"
+        offsetResetPolicy: earliest

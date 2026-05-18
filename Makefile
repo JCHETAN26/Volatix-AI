@@ -141,6 +141,36 @@ docker-shell:  ## Probe the distroless layout via debug variant (one-off debuggi
 	    $(IMAGE_NAME):$(IMAGE_TAG)-debug || \
 	    echo "Build with: docker build -t $(IMAGE_NAME):$(IMAGE_TAG)-debug --target builder ."
 
+# ---------------------------------------------------------------------------
+# Phase 3.2 — Kubernetes deployment + KEDA
+# ---------------------------------------------------------------------------
+.PHONY: keda-install
+keda-install:  ## Install KEDA into the local cluster (namespace: keda)
+	./scripts/install-keda.sh
+
+.PHONY: image-load
+image-load: docker-build  ## Load $(IMAGE_NAME):$(IMAGE_TAG) into Minikube so the pod can pull it
+	minikube image load $(IMAGE_NAME):$(IMAGE_TAG)
+
+.PHONY: k8s-deploy
+k8s-deploy:  ## Apply k8s/deployment.yaml + k8s/keda-scaledobject.yaml
+	kubectl apply -f k8s/deployment.yaml
+	kubectl apply -f k8s/keda-scaledobject.yaml
+
+.PHONY: k8s-undeploy
+k8s-undeploy:  ## Tear down the chainguard Deployment + ScaledObject
+	kubectl delete -f k8s/keda-scaledobject.yaml --ignore-not-found
+	kubectl delete -f k8s/deployment.yaml --ignore-not-found
+
+.PHONY: flood-kafka
+flood-kafka:  ## Phase 3.2 acceptance: 50k records → KEDA scale-out
+	./scripts/flood-kafka.sh $${FLOOD_N:-50000}
+
+.PHONY: watch-pods
+watch-pods:  ## Watch chainguard pods + the KEDA-managed HPA
+	@echo "Ctrl-C to stop."
+	kubectl get pods,hpa -l app.kubernetes.io/name=chainguard-engine --watch
+
 .PHONY: mock-ticker
 mock-ticker:  ## Run the dev WebSocket ticker on ws://localhost:8765 (Ctrl-C to stop)
 	python3 scripts/mock-ticker.py --rate $${MOCK_RATE:-25000}

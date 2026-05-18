@@ -32,10 +32,12 @@
 
 namespace chainguard {
 
-constexpr const char* kVersion = "0.3.0";
+constexpr const char* kVersion = "0.3.1";
 constexpr const char* kDefaultBrokers = "localhost:9092";
 constexpr const char* kDefaultWsUrl = "ws://localhost:8765/";
 constexpr const char* kSmokeTopic = "chainguard.smoke";
+constexpr const char* kDefaultConsumeTopic = "raw-ticks";
+constexpr const char* kDefaultConsumeGroup = "chainguard-engine";
 constexpr int kSmokeMessageCount = 10;
 constexpr int kFlushTimeoutMs = 10'000;
 constexpr int kMetadataTimeoutMs = 5'000;
@@ -325,6 +327,12 @@ void print_usage(const char* argv0) {
               << "  --engine                            Run full pipeline: WS → SPSC ring →\n"
               << "                                      OFI/RV → Kafka topic '"
               << kFinancialFeaturesTopic << "'\n"
+              << "  --consume [TOPIC]                   Subscribe to a Kafka topic under a\n"
+              << "                                      consumer group (Phase 3.2 KEDA lag\n"
+              << "                                      signal). Default topic: "
+              << kDefaultConsumeTopic << "\n"
+              << "  --group GROUP                       Consumer group for --consume\n"
+              << "                                      (default: " << kDefaultConsumeGroup << ")\n"
               << "  --feature-bench [P [F]]             Bench frame-gen latency. P = prefill\n"
               << "                                      ticks (default: "
               << kDefaultBenchPrefillTicks << "), F = frame\n"
@@ -342,6 +350,8 @@ int main(int argc, char** argv) {
 
     std::string brokers = kDefaultBrokers;
     std::string ws_url = kDefaultWsUrl;
+    std::string consume_topic = kDefaultConsumeTopic;
+    std::string consume_group = kDefaultConsumeGroup;
     int throughput_count = kDefaultThroughputCount;
     int bench_prefill = kDefaultBenchPrefillTicks;
     int bench_iterations = kDefaultBenchFrameIterations;
@@ -353,7 +363,7 @@ int main(int argc, char** argv) {
         ws_url = env;
     }
 
-    enum class Mode { Default, Probe, Smoke, Ingest, Throughput, Engine, Bench };
+    enum class Mode { Default, Probe, Smoke, Ingest, Throughput, Engine, Bench, Consume };
     Mode mode = Mode::Default;
 
     for (int i = 1; i < argc; ++i) {
@@ -379,6 +389,13 @@ int main(int argc, char** argv) {
             }
         } else if (arg == "--engine") {
             mode = Mode::Engine;
+        } else if (arg == "--consume") {
+            mode = Mode::Consume;
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                consume_topic = argv[++i];
+            }
+        } else if (arg == "--group" && i + 1 < argc) {
+            consume_group = argv[++i];
         } else if (arg == "--feature-bench") {
             mode = Mode::Bench;
             if (i + 1 < argc && argv[i + 1][0] != '-') {
@@ -430,11 +447,13 @@ int main(int argc, char** argv) {
         }
         case Mode::Bench:
             return run_feature_bench(bench_prefill, bench_iterations);
+        case Mode::Consume:
+            return run_consume(brokers, consume_topic, consume_group);
         case Mode::Default:
             // No args: build smoke-test (used by CI). Must not contact Kafka.
-            std::cout << "chainguard " << kVersion << " — Phase 2.3 build OK\n"
+            std::cout << "chainguard " << kVersion << " — Phase 3 build OK\n"
                       << "  Modes: --probe | --smoke | --ingest | --throughput-test\n"
-                      << "         --engine | --feature-bench\n"
+                      << "         --engine | --feature-bench | --consume\n"
                       << "  Default brokers: " << brokers << '\n'
                       << "  Default ws-url:  " << ws_url << '\n';
             return EXIT_SUCCESS;
