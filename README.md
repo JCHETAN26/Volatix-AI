@@ -115,8 +115,21 @@ make port-forward-vector   # exposes localhost:6333 (HTTP) + 6334 (gRPC)
 ### 2. Build the C++ engine
 ```bash
 make cpp-build       # cmake configure + build
-make cpp-run         # build + execute
+make cpp-run         # build + execute (no broker contact)
 ```
+
+Verify the Kafka producer link (requires `make port-forward-kafka` in another terminal, or pass `KAFKA_BROKERS=host:port`):
+```bash
+make cpp-probe       # metadata request only — confirms reachability
+make cpp-smoke       # produces 10 records to chainguard.smoke; fails if any drop
+```
+
+System dependencies (Ubuntu):
+```bash
+sudo apt-get install -y build-essential cmake ninja-build \
+    pkg-config librdkafka-dev libssl-dev
+```
+macOS (Homebrew): `brew install cmake librdkafka openssl pkg-config` and export `PKG_CONFIG_PATH=$(brew --prefix openssl)/lib/pkgconfig:$(brew --prefix librdkafka)/lib/pkgconfig`.
 
 ### 3. Run the analytics & agent stack
 ```bash

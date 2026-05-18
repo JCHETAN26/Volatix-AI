@@ -24,5 +24,18 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
     add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
+# --- System dependencies ---------------------------------------------------
+# Threads — needed by the Kafka producer and (Phase 2.2) Boost.Asio.
+find_package(Threads REQUIRED)
+
+# OpenSSL — required by librdkafka's TLS code path; tracked here so a future
+# move from PLAINTEXT to TLS brokers is a config flip, not a build flip.
+find_package(OpenSSL REQUIRED)
+
+# librdkafka (C++ wrapper) — discovered via pkg-config so we pick up the
+# distro package (Ubuntu apt librdkafka-dev, Homebrew librdkafka).
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(RDKAFKAPP REQUIRED IMPORTED_TARGET rdkafka++)
+
 # --- Subdirectories --------------------------------------------------------
 add_subdirectory(src)
