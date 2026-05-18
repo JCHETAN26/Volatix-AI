@@ -17,10 +17,10 @@
 #include <string>
 #include <string_view>
 
-// pkg-config rdkafka++ adds the librdkafka include dir directly to -I, so
-// the unprefixed header form is portable across Ubuntu (/usr/include/librdkafka)
-// and Homebrew (/opt/homebrew/include/librdkafka).
-#include <rdkafkacpp.h>
+// Both Ubuntu (librdkafka-dev) and Homebrew install the C++ headers under a
+// `librdkafka/` subdirectory of the include prefix that pkg-config exposes,
+// so this prefixed form is the portable one.
+#include <librdkafka/rdkafkacpp.h>
 
 namespace chainguard {
 
