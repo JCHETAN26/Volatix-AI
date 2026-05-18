@@ -124,12 +124,25 @@ make cpp-probe       # metadata request only — confirms reachability
 make cpp-smoke       # produces 10 records to chainguard.smoke; fails if any drop
 ```
 
+WebSocket ingest + SIMD JSON parsing (Phase 2.2):
+```bash
+pip install websockets                # one-time
+make mock-ticker                      # terminal 1: ws://localhost:8765/ @ 25k tps
+make cpp-ingest                       # terminal 2: streams and prints rate
+make cpp-throughput                   # in-process benchmark; fails below 20k tps
+```
+`make mock-ticker` accepts `MOCK_RATE=50000` and the underlying script supports `--inject-malformed N` (per 1000) to exercise the parser's degrade-gracefully path.
+
 System dependencies (Ubuntu):
 ```bash
-sudo apt-get install -y build-essential cmake ninja-build \
-    pkg-config librdkafka-dev libssl-dev
+sudo apt-get install -y build-essential cmake ninja-build pkg-config \
+    librdkafka-dev libssl-dev libboost-system-dev libsimdjson-dev
 ```
-macOS (Homebrew): `brew install cmake librdkafka openssl pkg-config` and export `PKG_CONFIG_PATH=$(brew --prefix openssl)/lib/pkgconfig:$(brew --prefix librdkafka)/lib/pkgconfig`.
+macOS (Homebrew):
+```bash
+brew install cmake librdkafka openssl pkg-config boost simdjson
+export PKG_CONFIG_PATH="$(brew --prefix openssl)/lib/pkgconfig:$(brew --prefix librdkafka)/lib/pkgconfig:$(brew --prefix simdjson)/lib/pkgconfig"
+```
 
 ### 3. Run the analytics & agent stack
 ```bash

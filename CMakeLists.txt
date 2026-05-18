@@ -37,5 +37,14 @@ find_package(OpenSSL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(RDKAFKAPP REQUIRED IMPORTED_TARGET rdkafka++)
 
+# Boost (Beast = WebSocket, Asio = io_context). Beast is header-only since
+# 1.66 but Asio depends on Boost.System at link time. The COMPONENTS line
+# pulls the system lib; Beast/Asio are picked up via Boost::headers.
+find_package(Boost 1.74 REQUIRED COMPONENTS system)
+
+# simdjson — discovered via pkg-config (Ubuntu apt libsimdjson-dev,
+# Homebrew simdjson). Hardware SIMD parsing for the ingest hot path.
+pkg_check_modules(SIMDJSON REQUIRED IMPORTED_TARGET simdjson)
+
 # --- Subdirectories --------------------------------------------------------
 add_subdirectory(src)
