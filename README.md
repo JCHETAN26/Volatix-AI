@@ -214,6 +214,19 @@ The agents service consumes `anomaly-scores`, filters on `high_risk=true`, and r
 
 Every case (enforced or not) is persisted to PostgreSQL `agent_report` for the Phase 5 dashboard.
 
+### 4. Launch the dashboard (Phase 5.1)
+```bash
+make port-forward-pg &                # exposes chain-db on localhost:5432
+make web-install                      # one-time
+# Pull the Postgres password from the Bitnami Secret and put it in web/.env.local:
+#   echo "DATABASE_URL=postgres://postgres:$(kubectl get secret chain-db-postgresql \
+#       -o jsonpath='{.data.postgres-password}' | base64 -d)@localhost:5432/postgres" \
+#       > web/.env.local
+make web-dev                          # http://localhost:3000
+```
+
+The board renders four KPI cards (scores/min, high-risk/min, enforced/24h, mean score), a ledger status indicator (SECURED / MONITORING / OFFLINE), a live anomaly-score feed and an agent-report inspector with full markdown rationale. Server Components hydrate the initial state; `app/api/stream` then streams new rows via SSE. The same code is what Vercel builds — set `DATABASE_URL` in the project settings and the deploy renders the same dashboard.
+
 ### 4. Launch the dashboard
 ```bash
 cd web

@@ -1,0 +1,24 @@
+# Next.js
+.next/
+out/
+
+# Node
+node_modules/
+.pnpm-store/
+*.tsbuildinfo
+next-env.d.ts.diff
+
+# Logs
+*.log
+.npm
+.eslintcache
+
+# Local env
+.env*
+!.env.example
+
+# Vercel
+.vercel/
+
+# Editor / OS
+.DS_Store
