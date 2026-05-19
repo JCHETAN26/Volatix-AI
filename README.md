@@ -99,13 +99,26 @@ helm version
 
 ## Build & Run
 
+### 0. Provision Supabase (one-time)
+
+1. Create a Supabase project at https://supabase.com (free tier is plenty).
+2. Copy the **session pooler** connection string from Project Settings → Database. It looks like:
+   ```
+   postgres://postgres.<project>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+   ```
+3. Export it in your shell (and in Vercel project settings):
+   ```bash
+   export DATABASE_URL='postgres://postgres.<project>:<password>@...pooler.supabase.com:5432/postgres'
+   make init-postgres        # applies scripts/sql/init.sql to your project
+   ```
+
 ### 1. Bootstrap local infrastructure
 ```bash
-make infra-up        # minikube + chain-kafka + chain-db + vector-db (Qdrant)
+make infra-up        # minikube + chain-kafka + vector-db (Qdrant)
 make pods            # sanity-check Running state
-make validate        # PostgreSQL SELECT + Qdrant create/get/delete a test collection
+make validate        # Qdrant create/get/delete a test collection
 ```
-Under the hood: `scripts/bootstrap-infra.sh` runs `minikube start --cpus=4 --memory=8192`, installs the Bitnami Helm charts for Kafka and PostgreSQL, and applies `k8s/vector-db.yaml`.
+Under the hood: `scripts/bootstrap-infra.sh` runs `minikube start --cpus=4 --memory=8192`, installs the Bitnami Helm chart for Kafka, and applies `k8s/vector-db.yaml`. PostgreSQL is intentionally absent — it lives in your Supabase project (see step 0).
 
 For validating the vector DB you need a port-forward in another terminal:
 ```bash
@@ -180,8 +193,11 @@ export PKG_CONFIG_PATH="$(brew --prefix openssl)/lib/pkgconfig:$(brew --prefix l
 
 ### 3. Run the analytics & agent stack (Phase 4)
 ```bash
-# One-time schema setup
+# Schema goes into Supabase (from step 0 above)
 make init-postgres
+
+# Make sure the cluster can talk to Supabase
+make set-db-url                       # syncs $DATABASE_URL into the chainguard-db Secret
 
 # Build + load the Python classifier image (bakes a baseline LightGBM
 # model from synthetic data so the service can boot cold)
@@ -216,12 +232,8 @@ Every case (enforced or not) is persisted to PostgreSQL `agent_report` for the P
 
 ### 4. Launch the dashboard (Phase 5.1)
 ```bash
-make port-forward-pg &                # exposes chain-db on localhost:5432
 make web-install                      # one-time
-# Pull the Postgres password from the Bitnami Secret and put it in web/.env.local:
-#   echo "DATABASE_URL=postgres://postgres:$(kubectl get secret chain-db-postgresql \
-#       -o jsonpath='{.data.postgres-password}' | base64 -d)@localhost:5432/postgres" \
-#       > web/.env.local
+echo "DATABASE_URL=${DATABASE_URL}" > web/.env.local
 make web-dev                          # http://localhost:3000
 ```
 
@@ -229,11 +241,10 @@ The board renders four KPI cards (scores/min, high-risk/min, enforced/24h, mean 
 
 ### 5. End-to-end demo (Phase 5.2)
 ```bash
-make demo-up                          # everything: infra + images + manifests + seeds + port-forwards
+export DATABASE_URL='postgres://postgres.<project>:<password>@...pooler.supabase.com:5432/postgres'
+make demo-up                          # init-postgres → infra → set-db-url → images → manifests → seeds
 # In another terminal: bring the dashboard up
-echo "DATABASE_URL=postgres://postgres:$(kubectl get secret chain-db-postgresql \
-    -o jsonpath='{.data.postgres-password}' | base64 -d)@localhost:5432/postgres" \
-    > web/.env.local
+echo "DATABASE_URL=${DATABASE_URL}" > web/.env.local
 make web-install && make web-dev      # http://localhost:3000
 
 # Drive the timing test (inject feature frames straight onto Kafka):

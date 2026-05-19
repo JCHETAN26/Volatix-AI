@@ -6,6 +6,9 @@
 #
 # Model artifact lives on a PVC ("chainguard-models") that the Airflow
 # trainer pod writes into. The classifier hot-reloads on pod restart.
+#
+# DATABASE_URL is supplied by the `chainguard-db` Secret. Apply it with:
+#   make set-db-url           # reads $DATABASE_URL from the shell
 
 ---
 apiVersion: v1
@@ -37,10 +40,6 @@ data:
   SCORE_THRESHOLD: "0.85"
   MODEL_PATH: "/models/baseline.txt"
   WRITE_POSTGRES: "true"
-  PGHOST: "chain-db-postgresql.default.svc.cluster.local"
-  PGPORT: "5432"
-  PGUSER: "postgres"
-  PGDATABASE: "postgres"
 
 ---
 apiVersion: apps/v1
@@ -75,11 +74,11 @@ spec:
             - configMapRef:
                 name: chainguard-classifier-config
           env:
-            - name: PGPASSWORD
+            - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: chain-db-postgresql
-                  key: postgres-password
+                  name: chainguard-db
+                  key: DATABASE_URL
           volumeMounts:
             - name: models
               mountPath: /models

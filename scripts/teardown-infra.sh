@@ -10,8 +10,9 @@
 set -euo pipefail
 
 KAFKA_RELEASE="${KAFKA_RELEASE:-chain-kafka}"
-DB_RELEASE="${DB_RELEASE:-chain-db}"
 NAMESPACE="${NAMESPACE:-default}"
+
+# Note: PostgreSQL is managed (Supabase) and never lives in-cluster.
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VECTOR_MANIFEST="${REPO_ROOT}/k8s/vector-db.yaml"
@@ -33,12 +34,11 @@ kubectl delete -f "${VECTOR_MANIFEST}" -n "${NAMESPACE}" --ignore-not-found
 
 log "Uninstalling Helm releases"
 helm uninstall "${KAFKA_RELEASE}" -n "${NAMESPACE}" 2>/dev/null || warn "${KAFKA_RELEASE} not installed"
-helm uninstall "${DB_RELEASE}"    -n "${NAMESPACE}" 2>/dev/null || warn "${DB_RELEASE} not installed"
 
 # Clean up Bitnami-managed PVCs (Helm leaves these behind on purpose).
 log "Removing leftover PersistentVolumeClaims"
 kubectl get pvc -n "${NAMESPACE}" -o name 2>/dev/null \
-    | grep -E "(${KAFKA_RELEASE}|${DB_RELEASE})" \
+    | grep -E "${KAFKA_RELEASE}" \
     | xargs -r kubectl delete -n "${NAMESPACE}" --ignore-not-found
 
 case "${MODE}" in

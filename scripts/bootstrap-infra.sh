@@ -21,9 +21,11 @@ set -euo pipefail
 MINIKUBE_CPUS="${MINIKUBE_CPUS:-4}"
 MINIKUBE_MEMORY="${MINIKUBE_MEMORY:-8192}"
 KAFKA_RELEASE="${KAFKA_RELEASE:-chain-kafka}"
-DB_RELEASE="${DB_RELEASE:-chain-db}"
 NAMESPACE="${NAMESPACE:-default}"
 WAIT_TIMEOUT="${WAIT_TIMEOUT:-300s}"
+
+# Note: PostgreSQL is now managed (Supabase) rather than in-cluster.
+# See scripts/init-postgres.sh for schema bootstrapping.
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VECTOR_MANIFEST="${REPO_ROOT}/k8s/vector-db.yaml"
@@ -89,17 +91,7 @@ helm upgrade --install "${KAFKA_RELEASE}" bitnami/kafka \
 ok "Kafka deployed"
 
 # ---------------------------------------------------------------------------
-# 4. PostgreSQL
-# ---------------------------------------------------------------------------
-log "Installing/Upgrading PostgreSQL release '${DB_RELEASE}'"
-helm upgrade --install "${DB_RELEASE}" bitnami/postgresql \
-    --namespace "${NAMESPACE}" \
-    --wait \
-    --timeout "${WAIT_TIMEOUT}"
-ok "PostgreSQL deployed"
-
-# ---------------------------------------------------------------------------
-# 5. Vector DB (Qdrant)
+# 4. Vector DB (Qdrant)
 # ---------------------------------------------------------------------------
 log "Applying vector DB manifest (${VECTOR_MANIFEST})"
 kubectl apply -f "${VECTOR_MANIFEST}" -n "${NAMESPACE}"
@@ -119,12 +111,14 @@ echo
 cat <<EOF
 Connection hints (cluster-internal DNS):
   Kafka      : ${KAFKA_RELEASE}.${NAMESPACE}.svc.cluster.local:9092
-  PostgreSQL : ${DB_RELEASE}-postgresql.${NAMESPACE}.svc.cluster.local:5432
   Vector DB  : vector-db.${NAMESPACE}.svc.cluster.local:6333  (HTTP)
                vector-db.${NAMESPACE}.svc.cluster.local:6334  (gRPC)
 
+PostgreSQL is managed (Supabase). Export DATABASE_URL=postgres://... and run:
+  make init-postgres      # applies scripts/sql/init.sql to Supabase
+  make set-db-url         # syncs the URL into the chainguard-db k8s Secret
+
 To validate from your laptop:
-  make validate           # runs all validators
+  make validate           # runs the vector-db validator
   make port-forward-vector
-  make port-forward-pg
 EOF

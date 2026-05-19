@@ -2,6 +2,10 @@
 
 We keep the surface tiny on purpose — only the rows we actually need to
 write so the schema in `scripts/sql/init.sql` is the source of truth.
+
+Connection precedence:
+  1. DATABASE_URL          (Supabase / any managed Postgres)
+  2. PGHOST/PGPORT/...     (libpq env vars; convenient for local dev)
 """
 
 from __future__ import annotations
@@ -16,9 +20,11 @@ from .feature_frame import FeatureFrame
 
 
 def connect_from_env() -> Connection:
-    """Reads standard libpq env vars (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)."""
+    """Reads DATABASE_URL first, falls back to libpq env vars."""
+    if dsn := os.getenv("DATABASE_URL"):
+        return psycopg2.connect(dsn, application_name="chainguard-classifier")
     return psycopg2.connect(
-        host=os.getenv("PGHOST", "chain-db-postgresql.default.svc.cluster.local"),
+        host=os.getenv("PGHOST", "localhost"),
         port=int(os.getenv("PGPORT", "5432")),
         user=os.getenv("PGUSER", "postgres"),
         password=os.getenv("PGPASSWORD", ""),

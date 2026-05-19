@@ -41,10 +41,6 @@ data:
   QDRANT_COLLECTION: "attack_vectors"
   LLM_PROVIDER: ""        # blank → auto-select openai / mock by OPENAI_API_KEY
   LLM_MODEL: "gpt-4o-mini"
-  PGHOST: "chain-db-postgresql.default.svc.cluster.local"
-  PGPORT: "5432"
-  PGUSER: "postgres"
-  PGDATABASE: "postgres"
 
 ---
 apiVersion: apps/v1
@@ -79,11 +75,11 @@ spec:
             - configMapRef:
                 name: chainguard-agents-config
           env:
-            - name: PGPASSWORD
+            - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: chain-db-postgresql
-                  key: postgres-password
+                  name: chainguard-db
+                  key: DATABASE_URL
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:

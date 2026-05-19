@@ -29,21 +29,17 @@ DEFAULT_ARGS = {
 }
 
 TRAINER_IMAGE = os.getenv("TRAINER_IMAGE", "chainguard-classifier:dev")
-DB_SECRET_NAME = os.getenv("DB_SECRET_NAME", "chain-db-postgresql")
+DB_SECRET_NAME = os.getenv("DB_SECRET_NAME", "chainguard-db")
 MODELS_PVC = os.getenv("MODELS_PVC", "chainguard-models")
 NAMESPACE = os.getenv("RETRAIN_NAMESPACE", "default")
 
 
 db_env = [
-    k8s.V1EnvVar(name="PGHOST", value="chain-db-postgresql.default.svc.cluster.local"),
-    k8s.V1EnvVar(name="PGPORT", value="5432"),
-    k8s.V1EnvVar(name="PGUSER", value="postgres"),
-    k8s.V1EnvVar(name="PGDATABASE", value="postgres"),
     k8s.V1EnvVar(
-        name="PGPASSWORD",
+        name="DATABASE_URL",
         value_from=k8s.V1EnvVarSource(
             secret_key_ref=k8s.V1SecretKeySelector(
-                name=DB_SECRET_NAME, key="postgres-password"
+                name=DB_SECRET_NAME, key="DATABASE_URL"
             )
         ),
     ),

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # ChainGuard-Core — end-to-end timing test (Phase 5.2 acceptance).
 #
-# Assumes `demo-up.sh` has already brought the stack online and the
-# background port-forwards are live (Kafka @ localhost:9092,
-# Postgres @ localhost:5432).
+# Prereqs:
+#   * `demo-up.sh` has the cluster stack running.
+#   * `make port-forward-kafka` is live (Kafka @ localhost:9092).
+#   * DATABASE_URL is set in this shell (Supabase or any Postgres).
+#   * psql is installed locally.
 #
 # Flow:
 #   1. Stamp the latest agent_report id.
@@ -17,7 +19,7 @@
 #      either way.
 #
 # Usage:
-#   ./scripts/end-to-end.sh                 # 5 frames, default broker/db
+#   ./scripts/end-to-end.sh
 #   COUNT=20 ACCEPTANCE_CEILING_S=8 ./scripts/end-to-end.sh
 
 set -euo pipefail
@@ -26,37 +28,20 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${REPO_ROOT}"
 
 BROKERS="${BROKERS:-localhost:9092}"
-PGHOST="${PGHOST:-localhost}"
-PGPORT="${PGPORT:-5432}"
-PGUSER="${PGUSER:-postgres}"
-PGDATABASE="${PGDATABASE:-postgres}"
 COUNT="${COUNT:-5}"
 TIMEOUT_S="${TIMEOUT_S:-30}"
 ACCEPTANCE_CEILING_S="${ACCEPTANCE_CEILING_S:-5}"
 
 log()  { printf "\033[1;34m▶\033[0m %s\n" "$*"; }
 ok()   { printf "\033[1;32m✓\033[0m %s\n" "$*"; }
-warn() { printf "\033[1;33m!\033[0m %s\n" "$*"; }
 die()  { printf "\033[1;31m✗\033[0m %s\n" "$*" >&2; exit 1; }
 
 command -v python3 >/dev/null || die "missing python3"
-command -v kubectl >/dev/null || die "missing kubectl"
-
-# Pull the Bitnami-generated Postgres password if PGPASSWORD isn't set.
-if [ -z "${PGPASSWORD:-}" ]; then
-    PGPASSWORD="$(kubectl get secret chain-db-postgresql \
-        -o jsonpath='{.data.postgres-password}' 2>/dev/null | base64 --decode)"
-    [ -n "${PGPASSWORD}" ] || die "set PGPASSWORD env or ensure chain-db-postgresql secret exists"
-    export PGPASSWORD
-fi
-export PGHOST PGPORT PGUSER PGDATABASE
+command -v psql    >/dev/null || die "missing psql (brew install libpq)"
+[ -n "${DATABASE_URL:-}" ] || die "set DATABASE_URL first (your Supabase connection string)"
 
 run_sql() {
-    # Single-row SQL through a transient kafka client pod is overkill; use
-    # `psql` from the chain-db pod instead — it's already in the cluster.
-    kubectl exec -n default chain-db-postgresql-0 -- \
-        env PGPASSWORD="${PGPASSWORD}" \
-        psql -tAU "${PGUSER}" -d "${PGDATABASE}" -c "$1"
+    psql "${DATABASE_URL}" -tAc "$1"
 }
 
 # 1. Stamp
