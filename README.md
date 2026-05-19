@@ -227,6 +227,30 @@ make web-dev                          # http://localhost:3000
 
 The board renders four KPI cards (scores/min, high-risk/min, enforced/24h, mean score), a ledger status indicator (SECURED / MONITORING / OFFLINE), a live anomaly-score feed and an agent-report inspector with full markdown rationale. Server Components hydrate the initial state; `app/api/stream` then streams new rows via SSE. The same code is what Vercel builds — set `DATABASE_URL` in the project settings and the deploy renders the same dashboard.
 
+### 5. End-to-end demo (Phase 5.2)
+```bash
+make demo-up                          # everything: infra + images + manifests + seeds + port-forwards
+# In another terminal: bring the dashboard up
+echo "DATABASE_URL=postgres://postgres:$(kubectl get secret chain-db-postgresql \
+    -o jsonpath='{.data.postgres-password}' | base64 -d)@localhost:5432/postgres" \
+    > web/.env.local
+make web-install && make web-dev      # http://localhost:3000
+
+# Drive the timing test (inject feature frames straight onto Kafka):
+make end-to-end                       # prints "injected → row written = N ms"
+
+# For the full WS → C++ → … recording, point the engine at the exploit WS:
+make exploit-ws                       # starts ws://localhost:8766/ in this terminal
+# Then in a docker shell (or wherever you can run the C++ binary):
+docker run --rm --network=host -e WS_URL=ws://localhost:8766/ \
+    -e KAFKA_BROKERS=localhost:9092 chainguard-core:dev --engine
+
+make demo-down                        # tear everything down (cluster preserved)
+make demo-down-full                   # also `minikube stop`
+```
+
+After the local acceptance run is green, tag the release per `CHANGELOG.md`.
+
 ### 4. Launch the dashboard
 ```bash
 cd web
