@@ -1,5 +1,28 @@
 # ChainGuard-Core — Changelog
 
+## Unreleased
+
+### Architecture
+
+- **Postgres moves to Supabase (managed).** The in-cluster Bitnami
+  PostgreSQL release (`chain-db`) is gone. All services — the Python
+  classifier + trainer, the LangGraph agents, the Airflow retraining
+  DAG, and the Next.js dashboard — connect via a single `DATABASE_URL`
+  env var (libpq URL form, accepted natively by psycopg2 and node-pg).
+  The in-cluster `chainguard-db` Secret holds the URL; `make set-db-url`
+  syncs `$DATABASE_URL` from your shell into it. Schema bootstrap
+  (`scripts/init-postgres.sh`) now runs local `psql` against the
+  Supabase host. `scripts/end-to-end.sh` likewise uses local `psql`
+  instead of `kubectl exec`-ing into a pod that no longer exists.
+- **Why:** Vercel deploys can now reach the same Postgres the
+  in-cluster services use, so the deployed dashboard actually shows
+  live data. One less local service to babysit, no PVC/upgrade pain.
+- **Trade-off:** Second deliberate deviation from the build plan's
+  "all infrastructure must run natively inside Kubernetes" line
+  (Vercel for the frontend was the first). Data-plane infrastructure
+  — Kafka, Qdrant, the C++ engine, the classifier, the agents —
+  still runs in-cluster.
+
 ## v1.0.0 — Phase 5 complete
 
 End-to-end financial threat-detection pipeline:

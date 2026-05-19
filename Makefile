@@ -9,7 +9,7 @@ SHELL          := /usr/bin/env bash
 
 NAMESPACE      ?= default
 KAFKA_RELEASE  ?= chain-kafka
-DB_RELEASE     ?= chain-db
+# Postgres is managed (Supabase) — set DATABASE_URL in your shell.
 
 # ---------------------------------------------------------------------------
 # Help
@@ -24,7 +24,7 @@ help:  ## Show available targets
 # Phase 1 — Local infrastructure
 # ---------------------------------------------------------------------------
 .PHONY: infra-up
-infra-up:  ## Start Minikube + Kafka + Postgres + Vector DB
+infra-up:  ## Start Minikube + Kafka + Vector DB (Postgres lives in Supabase)
 	./scripts/bootstrap-infra.sh
 
 .PHONY: infra-down
@@ -47,11 +47,7 @@ pods:  ## Show pods in the chainguard namespace
 # Validation
 # ---------------------------------------------------------------------------
 .PHONY: validate
-validate: validate-pg validate-vector  ## Run all Phase 1 acceptance checks
-
-.PHONY: validate-pg
-validate-pg:  ## Run SELECT version() against chain-db
-	./scripts/validate-postgres.sh
+validate: validate-vector  ## Run all Phase 1 acceptance checks (Postgres is Supabase-managed)
 
 .PHONY: validate-vector
 validate-vector:  ## Create/get/delete a Qdrant collection via localhost:6333
@@ -64,13 +60,19 @@ validate-vector:  ## Create/get/delete a Qdrant collection via localhost:6333
 port-forward-vector:  ## Forward vector-db 6333/6334 to localhost
 	kubectl port-forward -n $(NAMESPACE) svc/vector-db 6333:6333 6334:6334
 
-.PHONY: port-forward-pg
-port-forward-pg:  ## Forward postgres 5432 to localhost
-	kubectl port-forward -n $(NAMESPACE) svc/$(DB_RELEASE)-postgresql 5432:5432
-
 .PHONY: port-forward-kafka
 port-forward-kafka:  ## Forward Kafka 9092 to localhost
 	kubectl port-forward -n $(NAMESPACE) svc/$(KAFKA_RELEASE) 9092:9092
+
+# ---------------------------------------------------------------------------
+# Managed Postgres (Supabase) helpers
+# ---------------------------------------------------------------------------
+.PHONY: set-db-url
+set-db-url:  ## Sync $$DATABASE_URL into the chainguard-db k8s Secret
+	@test -n "$$DATABASE_URL" || (echo "set DATABASE_URL first (Supabase URL)" && exit 1)
+	kubectl create secret generic chainguard-db \
+	    --from-literal=DATABASE_URL="$$DATABASE_URL" \
+	    --dry-run=client -o yaml | kubectl apply -f -
 
 # ---------------------------------------------------------------------------
 # C++ engine (Phase 2)
@@ -178,7 +180,7 @@ CLASSIFIER_IMAGE_NAME ?= chainguard-classifier
 CLASSIFIER_IMAGE_TAG  ?= dev
 
 .PHONY: init-postgres
-init-postgres:  ## Apply scripts/sql/init.sql to chain-db
+init-postgres:  ## Apply scripts/sql/init.sql to $$DATABASE_URL (Supabase)
 	./scripts/init-postgres.sh
 
 .PHONY: classifier-test

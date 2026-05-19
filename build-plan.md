@@ -323,7 +323,10 @@ The following are intentionally excluded to prevent scope creep:
 - Multi-region geo-replicated Kafka cluster setup.
 - Production deployment onto public cloud providers (AWS EKS, MSK, managed cloud setups).
 - Multi-factor authentication mechanisms and fine-grained user access role controls (RBAC layers).
-- Heavy managed-cloud abstraction layers such as Supabase — all infrastructure must run natively inside Kubernetes.
+- ~~Heavy managed-cloud abstraction layers such as Supabase~~ — *amended post-1.0:* the
+  frontend deploys to **Vercel** and the relational store is **Supabase Postgres**. The
+  data-plane (Kafka, Qdrant, the C++ engine, the classifier, the agents) still runs
+  natively inside Kubernetes. See `CHANGELOG.md`.
 
 ---
 
