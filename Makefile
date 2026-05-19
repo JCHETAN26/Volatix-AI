@@ -276,6 +276,35 @@ web-lint:  ## next lint
 web-build:  ## Production build (what Vercel runs)
 	cd web && pnpm build
 
+# ---------------------------------------------------------------------------
+# Phase 5.2 — End-to-end demo
+# ---------------------------------------------------------------------------
+.PHONY: demo-up
+demo-up:  ## Bring the entire stack online (infra + images + manifests + seeds)
+	./scripts/demo-up.sh
+
+.PHONY: demo-down
+demo-down:  ## Tear down the demo stack (Minikube preserved)
+	./scripts/demo-down.sh
+
+.PHONY: demo-down-full
+demo-down-full:  ## Tear down + minikube stop
+	./scripts/demo-down.sh --full
+
+.PHONY: exploit-ws
+exploit-ws:  ## Launch the flash-loan WebSocket on :8766 (for the demo recording)
+	python3 scripts/exploit-ws.py $${EXPLOIT_ARGS:-}
+
+.PHONY: inject-features
+inject-features:  ## Publish flash-loan FeatureFrames directly onto financial-features
+	python3 scripts/inject-features.py \
+	    --brokers $${KAFKA_BROKERS:-localhost:9092} \
+	    --count $${INJECT_N:-5}
+
+.PHONY: end-to-end
+end-to-end:  ## Phase 5.2 acceptance: inject → DB row, prints latency
+	./scripts/end-to-end.sh
+
 .PHONY: mock-ticker
 mock-ticker:  ## Run the dev WebSocket ticker on ws://localhost:8765 (Ctrl-C to stop)
 	python3 scripts/mock-ticker.py --rate $${MOCK_RATE:-25000}
