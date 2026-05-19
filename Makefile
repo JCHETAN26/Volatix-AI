@@ -253,6 +253,29 @@ agents-set-openai-key:  ## Inject OPENAI_API_KEY env into the Secret (reads $$OP
 	    --from-literal=OPENAI_API_KEY=$$OPENAI_API_KEY \
 	    --dry-run=client -o yaml | kubectl apply -f -
 
+# ---------------------------------------------------------------------------
+# Phase 5.1 — Next.js 15 control board
+# ---------------------------------------------------------------------------
+.PHONY: web-install
+web-install:  ## pnpm install inside web/
+	cd web && pnpm install --frozen-lockfile
+
+.PHONY: web-dev
+web-dev:  ## Local dev server on http://localhost:3000 (needs DATABASE_URL)
+	cd web && pnpm dev
+
+.PHONY: web-typecheck
+web-typecheck:  ## tsc --noEmit
+	cd web && pnpm typecheck
+
+.PHONY: web-lint
+web-lint:  ## next lint
+	cd web && pnpm lint
+
+.PHONY: web-build
+web-build:  ## Production build (what Vercel runs)
+	cd web && pnpm build
+
 .PHONY: mock-ticker
 mock-ticker:  ## Run the dev WebSocket ticker on ws://localhost:8765 (Ctrl-C to stop)
 	python3 scripts/mock-ticker.py --rate $${MOCK_RATE:-25000}
