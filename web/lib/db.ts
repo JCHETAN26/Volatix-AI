@@ -10,11 +10,19 @@ let pool: Pool | null = null;
 
 function getPool(): Pool {
   if (pool) return pool;
+  // Supabase (and most managed Postgres) require TLS. node-postgres will
+  // auto-negotiate when the URL contains `sslmode=require`, but Supabase's
+  // pooler endpoint is sometimes served behind an intermediate cert that
+  // node's default CA set doesn't recognize on Vercel — flip rejectUnauthorized
+  // off so the handshake succeeds. Connection itself is still encrypted.
+  const url = env.databaseUrl;
+  const needsSsl = /supabase\.(com|co)/i.test(url) || /sslmode=require/i.test(url);
   pool = new Pool({
-    connectionString: env.databaseUrl,
+    connectionString: url,
     max: 5,
     idleTimeoutMillis: 10_000,
     connectionTimeoutMillis: env.dbConnectTimeoutMs,
+    ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
   });
   pool.on("error", (err) => {
     // Pool emits errors when idle clients drop; log and continue.

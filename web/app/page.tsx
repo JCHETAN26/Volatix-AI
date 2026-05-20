@@ -3,7 +3,7 @@ import { MetricCard } from "@/components/metric-card";
 import { Receipt } from "@/components/receipt";
 import { ReportInspector } from "@/components/report-inspector";
 import { ScoreFeed } from "@/components/score-feed";
-import { safeQuery } from "@/lib/db";
+import { pingDb, safeQuery } from "@/lib/db";
 import { isDbConfigured } from "@/lib/env";
 import { fmtCompact, fmtNumber, fmtPct } from "@/lib/format";
 import type {
@@ -135,8 +135,8 @@ function ledgerFor(kpis: KpiSnapshot, dbAlive: boolean): {
     return {
       status: "OFFLINE",
       description: isDbConfigured()
-        ? "Postgres unreachable. Check chain-db rollout + port-forward."
-        : "DATABASE_URL is not set in this environment.",
+        ? "Postgres unreachable. Verify DATABASE_URL points at the live Supabase project + the password matches the rotated value."
+        : "DATABASE_URL is not set. Add it under Vercel → Project Settings → Environment Variables.",
     };
   }
   if (kpis.highRiskLastMinute > 0) {
@@ -152,13 +152,13 @@ function ledgerFor(kpis: KpiSnapshot, dbAlive: boolean): {
 }
 
 export default async function DashboardPage() {
-  const [kpis, scores, reports, receipt] = await Promise.all([
+  const [kpis, scores, reports, receipt, dbAlive] = await Promise.all([
     loadKpis(),
     loadInitialScores(),
     loadInitialReports(),
     loadLatestReceipt(),
+    pingDb(),
   ]);
-  const dbAlive = isDbConfigured() && scores.length + reports.length > 0;
   const ledger = ledgerFor(kpis, dbAlive);
 
   return (
