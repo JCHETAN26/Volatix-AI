@@ -3,6 +3,7 @@
 import * as React from "react";
 import ReactMarkdown from "react-markdown";
 
+import { ReceiptCard } from "@/components/receipt";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -81,11 +82,16 @@ export function ReportInspector({
                 </li>
               ))}
             </ol>
-            <div className="rounded-md bg-bg-subtle/70 border border-white/5 p-4 overflow-auto max-h-[28rem]">
+            <div className="space-y-3">
               {selected ? (
-                <article className="prose prose-invert prose-sm max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-h1:text-base prose-h2:text-sm prose-h2:uppercase prose-h2:tracking-[0.16em] prose-h2:text-white/60 prose-code:text-accent-amber">
-                  <ReactMarkdown>{selected.rationale_md || "_(empty)_"}</ReactMarkdown>
-                </article>
+                <>
+                  <ReceiptCard row={selected} hideContext />
+                  <div className="rounded-md bg-bg-subtle/70 border border-white/5 p-4 overflow-auto max-h-[24rem]">
+                    <article className="prose prose-invert prose-sm max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-h1:text-base prose-h2:text-sm prose-h2:uppercase prose-h2:tracking-[0.16em] prose-h2:text-white/60 prose-code:text-accent-amber">
+                      <ReactMarkdown>{selected.rationale_md || "_(empty)_"}</ReactMarkdown>
+                    </article>
+                  </div>
+                </>
               ) : (
                 <EmptyState title="Select a case" />
               )}
