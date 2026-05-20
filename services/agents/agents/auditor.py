@@ -89,5 +89,6 @@ def risk_auditor(state: CaseState, llm) -> dict[str, Any]:
     confidence = _extract_confidence(content, fallback=_heuristic_confidence(state))
     return {
         "confidence": confidence,
+        "audit_prompt": prompt,
         "audit_rationale": content,
     }

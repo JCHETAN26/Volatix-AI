@@ -168,6 +168,42 @@ class AgentService:
         if not self._pg_conn:
             return
         try:
+            # Evidence carries the replay payload: per-stage prompts +
+            # rationales so the dashboard's Replay UI can animate the
+            # decision without re-running anything. Shape is documented
+            # in web/lib/types.ts as AgentReportEvidence.
+            evidence = {
+                "schema": "chainguard.agent_evidence.v1",
+                "features": state.features,
+                "rag_matches": [m.model_dump() for m in state.rag_matches],
+                "stages": {
+                    "forensic": {
+                        "prompt": state.forensic_prompt,
+                        "rationale": state.forensic_rationale,
+                    },
+                    "auditor": {
+                        "prompt": state.audit_prompt,
+                        "rationale": state.audit_rationale,
+                        "confidence": state.confidence,
+                    },
+                    "enforcer": {
+                        "prompt": state.enforcement_prompt,
+                        "rationale": state.enforcement_rationale,
+                        "action": (
+                            state.enforcement_action.model_dump()
+                            if state.enforcement_action is not None
+                            else None
+                        ),
+                    },
+                },
+                # Kept at the top level for backwards compatibility with
+                # any consumer that read the v0 layout.
+                "enforcement_action": (
+                    state.enforcement_action.model_dump()
+                    if state.enforcement_action is not None
+                    else None
+                ),
+            }
             db_tool.insert_agent_report(
                 self._pg_conn,
                 case_id=state.case_id,
@@ -177,15 +213,7 @@ class AgentService:
                 confidence=state.confidence,
                 enforced=state.enforcement_action is not None,
                 rationale_md=state.rationale_md,
-                evidence={
-                    "features": state.features,
-                    "rag_matches": [m.model_dump() for m in state.rag_matches],
-                    "enforcement_action": (
-                        state.enforcement_action.model_dump()
-                        if state.enforcement_action is not None
-                        else None
-                    ),
-                },
+                evidence=evidence,
                 pipeline_case_id=state.pipeline_case_id,
                 wire_ts_ns=state.wire_ts_ns,
                 compute_ts_ns=state.compute_ts_ns,

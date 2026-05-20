@@ -15,6 +15,39 @@ export interface AnomalyScoreRow {
   score_ts_ns?: string | null;
 }
 
+// Structured shape of the agent_report.evidence JSONB column. Schema
+// tagged so future migrations can fan out; today only v1 exists.
+export interface AgentEvidence {
+  schema?: "chainguard.agent_evidence.v1" | string;
+  features?: Record<string, number>;
+  rag_matches?: Array<{
+    attack_id: string;
+    name: string;
+    severity: number;
+    similarity: number;
+  }>;
+  stages?: {
+    forensic?: { prompt?: string; rationale?: string };
+    auditor?: { prompt?: string; rationale?: string; confidence?: number };
+    enforcer?: {
+      prompt?: string;
+      rationale?: string;
+      action?: {
+        action: string;
+        target: string;
+        reason_code: string;
+        notes?: string;
+      } | null;
+    };
+  };
+  enforcement_action?: {
+    action: string;
+    target: string;
+    reason_code: string;
+    notes?: string;
+  } | null;
+}
+
 export interface AgentReportRow {
   id: number;
   case_id: string;      // UUID — agent-internal id
@@ -25,8 +58,9 @@ export interface AgentReportRow {
   enforced: boolean;
   rationale_md: string;
   created_at: string;
-  // JSONB column — varies by case; rendered as raw JSON in the inspector.
-  evidence: unknown;
+  // Replay payload — narrowed from the JSONB column. May still be `null`
+  // on legacy rows written before PR C.
+  evidence: AgentEvidence | null;
   // Receipt-timeline join key + stage stamps.
   pipeline_case_id?: string | null;
   wire_ts_ns?: string | null;

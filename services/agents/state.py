@@ -62,14 +62,17 @@ class CaseState(BaseModel):
 
     # --- Forensic Investigator ------------------------------------------
     rag_matches: list[AttackMatch] = Field(default_factory=list)
+    forensic_prompt: str = ""        # exact text sent to the LLM (replay)
     forensic_rationale: str = ""
 
     # --- Risk & Compliance Auditor --------------------------------------
     confidence: float = 0.0
+    audit_prompt: str = ""
     audit_rationale: str = ""
 
     # --- Settlement & Enforcer (conditional) -----------------------------
     enforcement_action: Optional[EnforcementAction] = None
+    enforcement_prompt: str = ""
     enforcement_rationale: str = ""
 
     # --- Final composed report ------------------------------------------

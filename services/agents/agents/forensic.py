@@ -85,5 +85,6 @@ def forensic_investigator(state: CaseState, llm, rag: QdrantRag) -> dict[str, An
     response = llm.invoke(prompt)
     return {
         "rag_matches": matches,
+        "forensic_prompt": prompt,
         "forensic_rationale": getattr(response, "content", str(response)),
     }
