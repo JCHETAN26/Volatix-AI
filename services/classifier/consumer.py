@@ -26,6 +26,10 @@ from kafka import KafkaConsumer, KafkaProducer
 from .feature_frame import FeatureFrame
 from .model import AnomalyModel
 
+
+def _now_ns() -> int:
+    return time.time_ns()
+
 log = logging.getLogger("classifier")
 
 
@@ -76,9 +80,10 @@ def make_producer(cfg: Config) -> KafkaProducer:
     )
 
 
-def build_score_payload(frame: FeatureFrame, score: float, threshold: float) -> dict:
+def build_score_payload(frame: FeatureFrame, score: float, threshold: float,
+                        score_ts_ns: int) -> dict:
     return {
-        "schema": "chainguard.anomaly_score.v1",
+        "schema": "chainguard.anomaly_score.v2",
         "ts_ns": frame.ts_ns,
         "symbol": frame.symbol,
         "score": score,
@@ -90,6 +95,13 @@ def build_score_payload(frame: FeatureFrame, score: float, threshold: float) -> 
             "total_volume": frame.total_volume,
             "window_count": frame.window_count,
         },
+        # Receipt-timeline anchors. The classifier forwards the engine-side
+        # timestamps verbatim so the agents can persist a complete
+        # T+0..T+score chain into agent_report.
+        "case_id": frame.case_id,
+        "wire_ts_ns": frame.wire_ts_ns,
+        "compute_ts_ns": frame.compute_ts_ns,
+        "score_ts_ns": score_ts_ns,
     }
 
 
@@ -135,12 +147,15 @@ class ClassifierService:
                         log.warning("skipping malformed message: %s", exc)
                         continue
                     score = self.model.predict_one(frame.as_feature_vector())
-                    payload = build_score_payload(frame, score, self.cfg.score_threshold)
+                    score_ts = _now_ns()
+                    payload = build_score_payload(
+                        frame, score, self.cfg.score_threshold, score_ts
+                    )
                     self.producer.send(self.cfg.out_topic, key=frame.symbol, value=payload)
                     n += 1
                     if payload["high_risk"]:
                         n_high += 1
-                    self._mirror_to_postgres(frame, score)
+                    self._mirror_to_postgres(frame, score, score_ts)
 
             now = time.monotonic()
             if now - last_report >= 5.0:
@@ -154,13 +169,16 @@ class ClassifierService:
             self._pg_conn.close()
         return 0
 
-    def _mirror_to_postgres(self, frame: FeatureFrame, score: float) -> None:
+    def _mirror_to_postgres(self, frame: FeatureFrame, score: float,
+                            score_ts_ns: int) -> None:
         if not self._pg_conn:
             return
         try:
             from . import db
             db.insert_feature_log(self._pg_conn, frame, label=None)
-            db.insert_anomaly_score(self._pg_conn, frame, score, model_id=None)
+            db.insert_anomaly_score(
+                self._pg_conn, frame, score, model_id=None, score_ts_ns=score_ts_ns
+            )
             self._pg_conn.commit()
         except Exception as exc:
             log.warning("postgres mirror failed; will rollback: %s", exc)

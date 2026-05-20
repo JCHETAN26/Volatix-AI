@@ -30,6 +30,12 @@ struct alignas(64) TickData {
     // Exchange timestamp in nanoseconds since the Unix epoch.
     std::int64_t ts_ns = 0;
 
+    // Engine-side wall-clock (system_clock ns since epoch) captured the
+    // moment the WS message hit the engine — i.e. T+0 in the Microsecond
+    // Receipt timeline. Set by the WS callback before the tick goes into
+    // the ring; zero if upstream forgot to stamp it (legacy paths).
+    std::int64_t wire_ts_ns = 0;
+
     // Last trade price in raw dollars (NOT pennies — keep parser simple).
     double price = 0.0;
 
