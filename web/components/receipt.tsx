@@ -15,47 +15,43 @@ import {
   type Timeline,
 } from "@/lib/timeline";
 import type { AgentReportRow } from "@/lib/types";
+import { usePoll } from "@/lib/use-poll";
 
 interface ReceiptProps {
   /** Initial value from SSR. */
   initial: AgentReportRow | null;
-  /** SSE endpoint that emits 'report' events. */
-  streamPath?: string;
+  /** REST endpoint to poll for the latest enforced case. */
+  apiPath?: string;
   className?: string;
   /** Hide the industry context block (used by the inspector embed). */
   hideContext?: boolean;
+  intervalMs?: number;
 }
 
 export function Receipt({
   initial,
-  streamPath = "/api/stream",
+  apiPath = "/api/receipt",
   className,
   hideContext = false,
+  intervalMs = 3_000,
 }: ReceiptProps) {
   const [row, setRow] = React.useState<AgentReportRow | null>(initial);
 
-  React.useEffect(() => {
-    const src = new EventSource(streamPath);
-    src.addEventListener("report", (e) => {
-      try {
-        const next = JSON.parse((e as MessageEvent).data) as AgentReportRow;
-        // Only swap in cases that beat the current displayed one and have
-        // a complete-ish timeline (at least an enforced stamp).
-        setRow((curr) => {
-          if (!next.enforced_ts_ns) return curr;
-          if (!curr) return next;
-          // Prefer newer wire_ts_ns, fall back to id ordering.
-          const newer =
-            (next.wire_ts_ns ?? "0") > (curr.wire_ts_ns ?? "0") ||
-            next.id > curr.id;
-          return newer ? next : curr;
-        });
-      } catch {
-        /* drop */
-      }
+  const handle = React.useCallback((data: { row?: AgentReportRow | null }) => {
+    const next = data?.row;
+    if (!next) return;
+    setRow((curr) => {
+      if (!next.enforced_ts_ns) return curr;
+      if (!curr) return next;
+      // Prefer newer wire_ts_ns, fall back to id ordering.
+      const newer =
+        (next.wire_ts_ns ?? "0") > (curr.wire_ts_ns ?? "0") ||
+        next.id > curr.id;
+      return newer ? next : curr;
     });
-    return () => src.close();
-  }, [streamPath]);
+  }, []);
+
+  usePoll<{ row?: AgentReportRow | null }>(apiPath, intervalMs, handle);
 
   if (!row) {
     return (
