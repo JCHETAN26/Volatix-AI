@@ -52,6 +52,14 @@ class CaseState(BaseModel):
     anomaly_score: float
     features: dict[str, float] = Field(default_factory=dict)
 
+    # --- Pipeline timeline (Receipt UI joins on these) --------------------
+    pipeline_case_id: Optional[int] = None  # the u64 from FeatureFrame.case_id
+    wire_ts_ns: Optional[int] = None        # T+0: tick hit the engine
+    compute_ts_ns: Optional[int] = None     # T+1: feature serialized
+    score_ts_ns: Optional[int] = None       # T+2: LightGBM predict done
+    verdict_ts_ns: Optional[int] = None     # T+3: LangGraph compile finished
+    enforced_ts_ns: Optional[int] = None    # T+4: freeze action emitted
+
     # --- Forensic Investigator ------------------------------------------
     rag_matches: list[AttackMatch] = Field(default_factory=list)
     forensic_rationale: str = ""

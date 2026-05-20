@@ -13,6 +13,7 @@ reviewed-but-not-enforced.
 
 from __future__ import annotations
 
+import time
 from typing import Any
 
 from ..state import CaseState, EnforcementAction
@@ -112,6 +113,7 @@ def settlement_enforcer(state: CaseState, llm) -> dict[str, Any]:
     response = llm.invoke(prompt)
     enforcement_md = getattr(response, "content", str(response))
     action = _default_action(state)
+    enforced_ts_ns = time.time_ns()  # T+4 for the Receipt UI
 
     # Build the final markdown using a *patched* CaseState so the helper
     # sees the freshly produced enforcement fields.
@@ -119,10 +121,12 @@ def settlement_enforcer(state: CaseState, llm) -> dict[str, Any]:
         update={
             "enforcement_action": action,
             "enforcement_rationale": enforcement_md,
+            "enforced_ts_ns": enforced_ts_ns,
         }
     )
     return {
         "enforcement_action": action,
         "enforcement_rationale": enforcement_md,
+        "enforced_ts_ns": enforced_ts_ns,
         "rationale_md": _compose_final_md(patched, enforced=True),
     }

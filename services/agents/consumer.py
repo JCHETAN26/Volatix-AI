@@ -68,6 +68,15 @@ def _make_consumer(cfg: Config) -> KafkaConsumer:
     )
 
 
+def _opt_int(v: Any) -> int | None:
+    if v is None:
+        return None
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def _payload_to_state(payload: dict[str, Any]) -> CaseState:
     return CaseState(
         case_id=uuid.uuid4(),
@@ -75,6 +84,10 @@ def _payload_to_state(payload: dict[str, Any]) -> CaseState:
         ts_ns=int(payload.get("ts_ns", 0)),
         anomaly_score=float(payload.get("score", 0.0)),
         features={k: float(v) for k, v in (payload.get("features") or {}).items()},
+        pipeline_case_id=_opt_int(payload.get("case_id")),
+        wire_ts_ns=_opt_int(payload.get("wire_ts_ns")),
+        compute_ts_ns=_opt_int(payload.get("compute_ts_ns")),
+        score_ts_ns=_opt_int(payload.get("score_ts_ns")),
     )
 
 
@@ -121,6 +134,10 @@ class AgentService:
                     try:
                         state = _payload_to_state(payload)
                         final_dict = self.graph.invoke(state)
+                        # Stamp the verdict timestamp BEFORE constructing the
+                        # final CaseState so it lives alongside enforced_ts_ns
+                        # in the same row.
+                        final_dict["verdict_ts_ns"] = time.time_ns()
                         final = CaseState.model_validate(final_dict)
                         n_processed += 1
                         if final.enforcement_action is not None:
@@ -169,6 +186,12 @@ class AgentService:
                         else None
                     ),
                 },
+                pipeline_case_id=state.pipeline_case_id,
+                wire_ts_ns=state.wire_ts_ns,
+                compute_ts_ns=state.compute_ts_ns,
+                score_ts_ns=state.score_ts_ns,
+                verdict_ts_ns=state.verdict_ts_ns,
+                enforced_ts_ns=state.enforced_ts_ns,
             )
         except Exception as exc:
             log.warning("agent_report insert failed: %s", exc)

@@ -69,4 +69,36 @@ CREATE TABLE IF NOT EXISTS agent_report (
 CREATE INDEX IF NOT EXISTS agent_report_ts_idx ON agent_report (ts_ns DESC);
 CREATE INDEX IF NOT EXISTS agent_report_symbol_idx ON agent_report (symbol);
 
+-- ===========================================================================
+-- Post-1.0 "Microsecond Receipt" additions.
+-- Every stage now stamps the wall-clock time it observed the case so the
+-- dashboard can render a complete T+0..T+enforced timeline. The case_id
+-- column is the join key — it comes from the C++ engine inside the
+-- FeatureFrame and flows through every Python service unchanged.
+-- All ADDs are idempotent; safe to rerun.
+-- ===========================================================================
+
+ALTER TABLE feature_log
+    ADD COLUMN IF NOT EXISTS case_id        BIGINT,
+    ADD COLUMN IF NOT EXISTS wire_ts_ns     BIGINT,
+    ADD COLUMN IF NOT EXISTS compute_ts_ns  BIGINT;
+
+ALTER TABLE anomaly_score_log
+    ADD COLUMN IF NOT EXISTS case_id        BIGINT,
+    ADD COLUMN IF NOT EXISTS wire_ts_ns     BIGINT,
+    ADD COLUMN IF NOT EXISTS compute_ts_ns  BIGINT,
+    ADD COLUMN IF NOT EXISTS score_ts_ns    BIGINT;
+
+ALTER TABLE agent_report
+    ADD COLUMN IF NOT EXISTS pipeline_case_id BIGINT,
+    ADD COLUMN IF NOT EXISTS wire_ts_ns       BIGINT,
+    ADD COLUMN IF NOT EXISTS compute_ts_ns    BIGINT,
+    ADD COLUMN IF NOT EXISTS score_ts_ns      BIGINT,
+    ADD COLUMN IF NOT EXISTS verdict_ts_ns    BIGINT,
+    ADD COLUMN IF NOT EXISTS enforced_ts_ns   BIGINT;
+
+CREATE INDEX IF NOT EXISTS feature_log_case_idx        ON feature_log (case_id);
+CREATE INDEX IF NOT EXISTS anomaly_score_log_case_idx  ON anomaly_score_log (case_id);
+CREATE INDEX IF NOT EXISTS agent_report_pipeline_idx   ON agent_report (pipeline_case_id);
+
 COMMIT;

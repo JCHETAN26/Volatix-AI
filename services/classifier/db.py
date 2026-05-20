@@ -40,8 +40,9 @@ def insert_feature_log(conn: Connection, frame: FeatureFrame, label: int | None)
     sql = """
         INSERT INTO feature_log
             (ts_ns, symbol, ofi, realized_vol, mid_price,
-             total_volume, window_count, label)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+             total_volume, window_count, label,
+             case_id, wire_ts_ns, compute_ts_ns)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     with conn.cursor() as cur:
         cur.execute(
@@ -55,19 +56,35 @@ def insert_feature_log(conn: Connection, frame: FeatureFrame, label: int | None)
                 frame.total_volume,
                 frame.window_count,
                 label,
+                frame.case_id,
+                frame.wire_ts_ns,
+                frame.compute_ts_ns,
             ),
         )
 
 
 def insert_anomaly_score(conn: Connection, frame: FeatureFrame, score: float,
-                         model_id: int | None) -> None:
+                         model_id: int | None, score_ts_ns: int) -> None:
     sql = """
         INSERT INTO anomaly_score_log
-            (ts_ns, symbol, score, model_id)
-        VALUES (%s, %s, %s, %s)
+            (ts_ns, symbol, score, model_id,
+             case_id, wire_ts_ns, compute_ts_ns, score_ts_ns)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     """
     with conn.cursor() as cur:
-        cur.execute(sql, (frame.ts_ns, frame.symbol, score, model_id))
+        cur.execute(
+            sql,
+            (
+                frame.ts_ns,
+                frame.symbol,
+                score,
+                model_id,
+                frame.case_id,
+                frame.wire_ts_ns,
+                frame.compute_ts_ns,
+                score_ts_ns,
+            ),
+        )
 
 
 def batch_commit(conn: Connection, rows: Iterable[tuple]) -> None:

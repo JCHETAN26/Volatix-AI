@@ -74,6 +74,24 @@ std::unique_ptr<RdKafka::Producer> make_engine_producer(const std::string& broke
     return producer;
 }
 
+// Engine-wide monotonic counter used for case_id. Starts at the process
+// start time (ns) in the high 32 bits so two engine instances launched at
+// different times don't trivially collide. Within one instance, every
+// FeatureFrame gets a unique id.
+std::atomic<std::uint64_t> g_case_id_counter{
+    static_cast<std::uint64_t>(std::chrono::system_clock::now().time_since_epoch().count()) &
+    0xFFFFFFFF00000000ULL};
+
+std::uint64_t next_case_id() noexcept {
+    return g_case_id_counter.fetch_add(1, std::memory_order_relaxed);
+}
+
+std::int64_t now_ns() noexcept {
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+               std::chrono::system_clock::now().time_since_epoch())
+        .count();
+}
+
 double mid_price_from(double last_price) noexcept {
     // No L2 book yet — mid-price is just the last trade print until
     // Phase 4 surfaces quote events.
@@ -93,6 +111,9 @@ FeatureFrame build_frame(const OfiWindow& ofi,
     f.realized_vol = rv.value();
     f.mid_price = mid;
     f.total_volume = ofi.total_volume();
+    f.case_id = next_case_id();
+    f.wire_ts_ns = latest.wire_ts_ns;  // T+0 — set by the WS callback
+    f.compute_ts_ns = now_ns();        // T+1 — engine done building
     return f;
 }
 
@@ -134,8 +155,13 @@ int run_engine(const EngineConfig& cfg) {
     // --- Producer thread (WebSocket parser → ring) -----------------------
     std::unique_ptr<WsClient> client;
     auto on_message = [&](std::string_view payload) {
+        // Stamp the wire arrival timestamp BEFORE parsing so the figure
+        // reflects how long the engine took to react, not how slow the
+        // parser was. The "Microsecond Receipt" UI anchors T+0 on this.
+        const std::int64_t wire = now_ns();
         thread_local TickParser parser;
         if (auto tick = parser.parse(payload); tick) {
+            tick->wire_ts_ns = wire;
             if (ring->try_push(*tick)) {
                 pushed.fetch_add(1, std::memory_order_relaxed);
             } else {
