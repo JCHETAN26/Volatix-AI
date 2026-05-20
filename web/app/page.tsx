@@ -213,8 +213,9 @@ export default async function DashboardPage() {
       </section>
 
       <footer className="text-xs text-white/30 pt-6">
-        Updates stream from <code>/api/stream</code> (Server-Sent Events).
-        Initial load fetched on the server.
+        Initial load fetched on the server; live updates poll{" "}
+        <code>/api/scores</code>, <code>/api/reports</code>, and{" "}
+        <code>/api/receipt</code> every couple of seconds.
       </footer>
     </main>
   );

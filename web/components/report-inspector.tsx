@@ -10,17 +10,21 @@ import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { fmtNumber, ago } from "@/lib/format";
 import type { AgentReportRow } from "@/lib/types";
+import { usePoll } from "@/lib/use-poll";
 
 interface ReportInspectorProps {
   initial: AgentReportRow[];
-  streamPath?: string;
+  /** REST endpoint to poll. */
+  apiPath?: string;
   capacity?: number;
+  intervalMs?: number;
 }
 
 export function ReportInspector({
   initial,
-  streamPath = "/api/stream",
+  apiPath = "/api/reports?limit=20",
   capacity = 20,
+  intervalMs = 3_000,
 }: ReportInspectorProps) {
   const [rows, setRows] = React.useState<AgentReportRow[]>(initial);
   const [selectedId, setSelectedId] = React.useState<number | null>(
@@ -28,22 +32,22 @@ export function ReportInspector({
   );
   const [replayRow, setReplayRow] = React.useState<AgentReportRow | null>(null);
 
-  React.useEffect(() => {
-    const src = new EventSource(streamPath);
-    src.addEventListener("report", (e) => {
-      try {
-        const row = JSON.parse((e as MessageEvent).data) as AgentReportRow;
-        setRows((prev) => {
-          if (prev.some((r) => r.id === row.id)) return prev;
-          return [row, ...prev].slice(0, capacity);
-        });
-        setSelectedId((curr) => curr ?? row.id);
-      } catch {
-        /* drop */
-      }
-    });
-    return () => src.close();
-  }, [streamPath, capacity]);
+  const handle = React.useCallback(
+    (data: { rows?: AgentReportRow[] }) => {
+      const next = data?.rows ?? [];
+      if (next.length === 0) return;
+      setRows((prev) => {
+        const seen = new Set(prev.map((r) => r.id));
+        const merged = [...next.filter((r) => !seen.has(r.id)), ...prev];
+        merged.sort((a, b) => Number(b.ts_ns) - Number(a.ts_ns));
+        return merged.slice(0, capacity);
+      });
+      setSelectedId((curr) => curr ?? next[0]?.id ?? null);
+    },
+    [capacity],
+  );
+
+  usePoll<{ rows?: AgentReportRow[] }>(apiPath, intervalMs, handle);
 
   const selected = rows.find((r) => r.id === selectedId) ?? rows[0];
 
