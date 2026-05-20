@@ -1,5 +1,6 @@
 import { LedgerStatusCard } from "@/components/ledger-status";
 import { MetricCard } from "@/components/metric-card";
+import { Receipt } from "@/components/receipt";
 import { ReportInspector } from "@/components/report-inspector";
 import { ScoreFeed } from "@/components/score-feed";
 import { safeQuery } from "@/lib/db";
@@ -75,14 +76,55 @@ async function loadInitialScores(): Promise<AnomalyScoreRow[]> {
 
 async function loadInitialReports(): Promise<AgentReportRow[]> {
   const r = await safeQuery<AgentReportRow>(
-    `SELECT id, case_id::text AS case_id, symbol, ts_ns::text AS ts_ns,
-            anomaly_score, confidence, enforced, rationale_md,
-            created_at, evidence
+    `SELECT id,
+            case_id::text                AS case_id,
+            symbol,
+            ts_ns::text                  AS ts_ns,
+            anomaly_score,
+            confidence,
+            enforced,
+            rationale_md,
+            created_at,
+            evidence,
+            pipeline_case_id::text       AS pipeline_case_id,
+            wire_ts_ns::text             AS wire_ts_ns,
+            compute_ts_ns::text          AS compute_ts_ns,
+            score_ts_ns::text            AS score_ts_ns,
+            verdict_ts_ns::text          AS verdict_ts_ns,
+            enforced_ts_ns::text         AS enforced_ts_ns
      FROM agent_report
      ORDER BY ts_ns DESC
      LIMIT 20`,
   );
   return r?.rows ?? [];
+}
+
+async function loadLatestReceipt(): Promise<AgentReportRow | null> {
+  const r = await safeQuery<AgentReportRow>(`
+    SELECT id,
+           case_id::text                AS case_id,
+           symbol,
+           ts_ns::text                  AS ts_ns,
+           anomaly_score,
+           confidence,
+           enforced,
+           rationale_md,
+           created_at,
+           evidence,
+           pipeline_case_id::text       AS pipeline_case_id,
+           wire_ts_ns::text             AS wire_ts_ns,
+           compute_ts_ns::text          AS compute_ts_ns,
+           score_ts_ns::text            AS score_ts_ns,
+           verdict_ts_ns::text          AS verdict_ts_ns,
+           enforced_ts_ns::text         AS enforced_ts_ns
+    FROM agent_report
+    WHERE enforced = TRUE
+      AND wire_ts_ns IS NOT NULL
+      AND enforced_ts_ns IS NOT NULL
+    ORDER BY wire_ts_ns DESC NULLS LAST, id DESC
+    LIMIT 1
+  `);
+  return r?.rows[0] ?? null;
 }
 
 function ledgerFor(kpis: KpiSnapshot, dbAlive: boolean): {
@@ -110,10 +152,11 @@ function ledgerFor(kpis: KpiSnapshot, dbAlive: boolean): {
 }
 
 export default async function DashboardPage() {
-  const [kpis, scores, reports] = await Promise.all([
+  const [kpis, scores, reports, receipt] = await Promise.all([
     loadKpis(),
     loadInitialScores(),
     loadInitialReports(),
+    loadLatestReceipt(),
   ]);
   const dbAlive = isDbConfigured() && scores.length + reports.length > 0;
   const ledger = ledgerFor(kpis, dbAlive);
@@ -161,6 +204,8 @@ export default async function DashboardPage() {
           }
         />
       </section>
+
+      <Receipt initial={receipt} />
 
       <section className="grid grid-cols-1 lg:grid-cols-[3fr,5fr] gap-6">
         <ScoreFeed initial={scores} />
