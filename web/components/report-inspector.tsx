@@ -4,6 +4,7 @@ import * as React from "react";
 import ReactMarkdown from "react-markdown";
 
 import { ReceiptCard } from "@/components/receipt";
+import { ReplayModal } from "@/components/replay-modal";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -25,6 +26,7 @@ export function ReportInspector({
   const [selectedId, setSelectedId] = React.useState<number | null>(
     initial[0]?.id ?? null,
   );
+  const [replayRow, setReplayRow] = React.useState<AgentReportRow | null>(null);
 
   React.useEffect(() => {
     const src = new EventSource(streamPath);
@@ -85,6 +87,14 @@ export function ReportInspector({
             <div className="space-y-3">
               {selected ? (
                 <>
+                  <div className="flex items-center justify-end">
+                    <button
+                      onClick={() => setReplayRow(selected)}
+                      className="rounded-md bg-accent-green/15 hover:bg-accent-green/25 ring-1 ring-inset ring-accent-green/30 text-accent-green text-xs font-medium px-3 py-1.5 transition"
+                    >
+                      ▶ Replay this case
+                    </button>
+                  </div>
                   <ReceiptCard row={selected} hideContext />
                   <div className="rounded-md bg-bg-subtle/70 border border-white/5 p-4 overflow-auto max-h-[24rem]">
                     <article className="prose prose-invert prose-sm max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-h1:text-base prose-h2:text-sm prose-h2:uppercase prose-h2:tracking-[0.16em] prose-h2:text-white/60 prose-code:text-accent-amber">
@@ -99,6 +109,11 @@ export function ReportInspector({
           </div>
         )}
       </CardBody>
+      <ReplayModal
+        row={replayRow}
+        open={replayRow !== null}
+        onClose={() => setReplayRow(null)}
+      />
     </Card>
   );
 }
