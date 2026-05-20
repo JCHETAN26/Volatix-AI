@@ -120,12 +120,14 @@ def settlement_enforcer(state: CaseState, llm) -> dict[str, Any]:
     patched = state.model_copy(
         update={
             "enforcement_action": action,
+            "enforcement_prompt": prompt,
             "enforcement_rationale": enforcement_md,
             "enforced_ts_ns": enforced_ts_ns,
         }
     )
     return {
         "enforcement_action": action,
+        "enforcement_prompt": prompt,
         "enforcement_rationale": enforcement_md,
         "enforced_ts_ns": enforced_ts_ns,
         "rationale_md": _compose_final_md(patched, enforced=True),

@@ -93,3 +93,40 @@ def test_low_confidence_path_skips_enforcer():
     assert final.enforcement_action is None
     assert "# ChainGuard Audit Report" in final.rationale_md
     assert "**enforced**: False" in final.rationale_md
+
+
+def test_replay_prompts_captured_on_enforcement():
+    """PR C contract: every stage that ran leaves its rendered prompt on
+    the final CaseState so PR D's Replay UI can show 'what we asked the
+    LLM' alongside 'what the LLM answered'."""
+    llm = MockChatLLM()
+    rag = StubRag(_qdrant_response(score=0.99))
+    graph = build_graph(llm, rag)
+
+    state = _initial_state(ofi=18_500.0, realized_vol=0.08)
+    final = CaseState.model_validate(graph.invoke(state))
+
+    # All three stages ran (high-confidence path).
+    assert "Forensic Investigator" in final.forensic_prompt
+    assert "Risk & Compliance Auditor" in final.audit_prompt
+    assert "Settlement & Enforcer" in final.enforcement_prompt
+
+    # And the LLM responses are recorded alongside.
+    assert final.forensic_rationale
+    assert final.audit_rationale
+    assert final.enforcement_rationale
+
+
+def test_replay_prompts_partial_on_low_confidence():
+    """Auditor still ran, enforcer didn't — replay should reflect that."""
+    llm = MockChatLLM()
+    rag = StubRag(_qdrant_response(score=0.10))
+    graph = build_graph(llm, rag)
+
+    state = _initial_state(ofi=10.0, realized_vol=0.001)
+    final = CaseState.model_validate(graph.invoke(state))
+
+    assert "Forensic Investigator" in final.forensic_prompt
+    assert "Risk & Compliance Auditor" in final.audit_prompt
+    assert final.enforcement_prompt == ""
+    assert final.enforcement_rationale == ""
