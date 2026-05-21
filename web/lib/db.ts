@@ -3,18 +3,31 @@ import { Pool, type QueryResult, type QueryResultRow } from "pg";
 
 import { env, isDbConfigured } from "./env";
 
-// Single shared pool. Module scope is per-server-process so this respects
-// Next.js' Node.js runtime caching (the dev server hot-reload still keeps
-// the same module instance unless it explicitly reloads).
+// Single shared pool per server process. On Vercel each function instance
+// is its own process; Supabase's session pooler caps at ~15 simultaneous
+// clients per project, so we keep max=1 and lean on Supabase's pooler to
+// absorb concurrency. For burstier traffic switch the DATABASE_URL to the
+// transaction pooler endpoint (port 6543) — Supabase's recommended setup
+// for serverless. Our queries are all simple parameterized SELECT/INSERTs
+// so transaction-mode is fine (we don't use prepared statements, LISTEN,
+// or session-scoped state).
 let pool: Pool | null = null;
 
 function getPool(): Pool {
   if (pool) return pool;
+  const url = env.databaseUrl;
+  // Supabase (and most managed Postgres) require TLS. node-postgres auto-
+  // negotiates when the URL contains sslmode=require, but Supabase's pooler
+  // is sometimes served behind an intermediate cert that node's default CA
+  // set doesn't recognize on Vercel — flip rejectUnauthorized off so the
+  // handshake succeeds. Connection is still encrypted.
+  const needsSsl = /supabase\.(com|co)/i.test(url) || /sslmode=require/i.test(url);
   pool = new Pool({
-    connectionString: env.databaseUrl,
-    max: 5,
+    connectionString: url,
+    max: 1,
     idleTimeoutMillis: 10_000,
     connectionTimeoutMillis: env.dbConnectTimeoutMs,
+    ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
   });
   pool.on("error", (err) => {
     // Pool emits errors when idle clients drop; log and continue.
