@@ -1,0 +1,69 @@
+# ChainGuard-Core — in-cluster mock-ticker (post-1.0 live demo).
+#
+# Same synthetic Polygon-flavored feed that scripts/mock-ticker.py
+# generates locally, deployed as a K8s Service so the in-cluster engine
+# can consume it via a stable DNS name. The engine-live deployment
+# defaults to this; flip to realfeed via `make swap-to-realfeed`.
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-ticker
+  labels:
+    app.kubernetes.io/name: mock-ticker
+    app.kubernetes.io/component: tick-source
+    app.kubernetes.io/part-of: chainguard-core
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mock-ticker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mock-ticker
+        app.kubernetes.io/component: tick-source
+        app.kubernetes.io/part-of: chainguard-core
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: mock-ticker
+          image: chainguard-mock-ticker:dev
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--host"
+            - "0.0.0.0"
+            - "--port"
+            - "8765"
+            - "--rate"
+            - "25000"
+          ports:
+            - name: ws
+              containerPort: 8765
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mock-ticker
+  labels:
+    app.kubernetes.io/name: mock-ticker
+    app.kubernetes.io/part-of: chainguard-core
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: mock-ticker
+  ports:
+    - name: ws
+      port: 8765
+      targetPort: ws

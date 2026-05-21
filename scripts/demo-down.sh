@@ -28,6 +28,7 @@ pkill -f "kubectl port-forward.*vector-db.*6333"   >/dev/null 2>&1 || true
 ok "port-forwards stopped"
 
 log "Removing k8s manifests"
+make engine-live-undeploy   2>/dev/null || true
 make agents-undeploy        2>/dev/null || true
 make classifier-undeploy    2>/dev/null || true
 make k8s-undeploy           2>/dev/null || true

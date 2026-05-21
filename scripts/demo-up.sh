@@ -77,14 +77,20 @@ log "Building chainguard-classifier"
 make classifier-load
 log "Building chainguard-agents"
 make agents-load
+log "Building chainguard-mock-ticker (in-cluster synthetic feed)"
+make mock-ticker-load
+log "Building chainguard-realfeed (Coinbase WS adapter)"
+make realfeed-load
 
 # ---------------------------------------------------------------------------
 # 6. Apply manifests
 # ---------------------------------------------------------------------------
 log "Deploying k8s manifests"
-make k8s-deploy           # chainguard-engine + KEDA ScaledObject
+make k8s-deploy           # chainguard-engine (KEDA --consume fixture) + ScaledObject
 make classifier-deploy
 make agents-deploy
+make tickers-deploy       # mock-ticker + realfeed Services
+make engine-live-deploy   # chainguard-engine-live (--engine mode, drives the dashboard)
 
 # ---------------------------------------------------------------------------
 # 7. Seed Qdrant via a temporary port-forward

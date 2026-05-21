@@ -307,6 +307,66 @@ inject-features:  ## Publish flash-loan FeatureFrames directly onto financial-fe
 end-to-end:  ## Phase 5.2 acceptance: inject → DB row, prints latency
 	./scripts/end-to-end.sh
 
+# ---------------------------------------------------------------------------
+# Post-1.0 — In-cluster live pipeline (mock-ticker + Coinbase realfeed
+# + a second engine deployment in --engine mode). The original
+# chainguard-engine deployment stays in --consume mode for the KEDA demo.
+# ---------------------------------------------------------------------------
+MOCK_TICKER_IMAGE_NAME ?= chainguard-mock-ticker
+MOCK_TICKER_IMAGE_TAG  ?= dev
+REALFEED_IMAGE_NAME    ?= chainguard-realfeed
+REALFEED_IMAGE_TAG     ?= dev
+
+.PHONY: mock-ticker-build
+mock-ticker-build:  ## Build the in-cluster mock-ticker image
+	docker build -f services/mock-ticker/Dockerfile \
+	    -t $(MOCK_TICKER_IMAGE_NAME):$(MOCK_TICKER_IMAGE_TAG) .
+
+.PHONY: mock-ticker-load
+mock-ticker-load: mock-ticker-build  ## Load mock-ticker into Minikube
+	minikube image load $(MOCK_TICKER_IMAGE_NAME):$(MOCK_TICKER_IMAGE_TAG)
+
+.PHONY: realfeed-build
+realfeed-build:  ## Build the Coinbase WS adapter image
+	docker build -f services/realfeed/Dockerfile \
+	    -t $(REALFEED_IMAGE_NAME):$(REALFEED_IMAGE_TAG) .
+
+.PHONY: realfeed-load
+realfeed-load: realfeed-build  ## Load realfeed into Minikube
+	minikube image load $(REALFEED_IMAGE_NAME):$(REALFEED_IMAGE_TAG)
+
+.PHONY: tickers-deploy
+tickers-deploy:  ## Deploy mock-ticker + realfeed as in-cluster Services
+	kubectl apply -f k8s/mock-ticker-deployment.yaml
+	kubectl apply -f k8s/realfeed-deployment.yaml
+
+.PHONY: engine-live-deploy
+engine-live-deploy:  ## Deploy chainguard-engine-live (--engine mode, drives the dashboard)
+	kubectl apply -f k8s/engine-live-deployment.yaml
+
+.PHONY: engine-live-undeploy
+engine-live-undeploy:  ## Remove the live engine + ticker Deployments
+	kubectl delete -f k8s/engine-live-deployment.yaml --ignore-not-found
+	kubectl delete -f k8s/realfeed-deployment.yaml --ignore-not-found
+	kubectl delete -f k8s/mock-ticker-deployment.yaml --ignore-not-found
+
+.PHONY: swap-to-mock
+swap-to-mock:  ## Point the live engine at the in-cluster mock-ticker (controllable demo)
+	kubectl set env deployment/chainguard-engine-live \
+	    WS_URL=ws://mock-ticker.default.svc.cluster.local:8765/
+	kubectl rollout status deployment/chainguard-engine-live --timeout=60s
+
+.PHONY: swap-to-realfeed
+swap-to-realfeed:  ## Point the live engine at the Coinbase WS adapter (real BTC trades)
+	kubectl set env deployment/chainguard-engine-live \
+	    WS_URL=ws://realfeed.default.svc.cluster.local:8765/
+	kubectl rollout status deployment/chainguard-engine-live --timeout=60s
+
+.PHONY: which-feed
+which-feed:  ## Show which WS source the live engine is currently consuming
+	@kubectl get deployment chainguard-engine-live \
+	    -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="WS_URL")].value}{"\n"}'
+
 .PHONY: mock-ticker
 mock-ticker:  ## Run the dev WebSocket ticker on ws://localhost:8765 (Ctrl-C to stop)
 	python3 scripts/mock-ticker.py --rate $${MOCK_RATE:-25000}

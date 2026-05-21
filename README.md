@@ -239,23 +239,58 @@ make web-dev                          # http://localhost:3000
 
 The board renders four KPI cards (scores/min, high-risk/min, enforced/24h, mean score), a ledger status indicator (SECURED / MONITORING / OFFLINE), a live anomaly-score feed and an agent-report inspector with full markdown rationale. Server Components hydrate the initial state; `app/api/stream` then streams new rows via SSE. The same code is what Vercel builds — set `DATABASE_URL` in the project settings and the deploy renders the same dashboard.
 
-### 5. End-to-end demo (Phase 5.2)
+### 5. End-to-end demo (Phase 5.2 + post-1.0 live pipeline)
 ```bash
 export DATABASE_URL='postgres://postgres.<project>:<password>@...pooler.supabase.com:5432/postgres'
-make demo-up                          # init-postgres → infra → set-db-url → images → manifests → seeds
+make demo-up                          # init-postgres → infra → set-db-url → images → manifests
+                                      # → seeds → live engine + mock-ticker + realfeed deployed
+
 # In another terminal: bring the dashboard up
 echo "DATABASE_URL=${DATABASE_URL}" > web/.env.local
 make web-install && make web-dev      # http://localhost:3000
+```
 
-# Drive the timing test (inject feature frames straight onto Kafka):
+After `demo-up`, the cluster is running a complete in-K8s pipeline by default — mock-ticker → chainguard-engine-live → Kafka → classifier → agents → Supabase → dashboard. The dashboard immediately starts showing live scores.
+
+**Switch which source feeds the engine on cue:**
+```bash
+make which-feed                       # prints the current WS_URL
+make swap-to-realfeed                 # → live BTC-USD trades from Coinbase
+make swap-to-mock                     # → controllable synthetic 25k tps
+```
+
+The realfeed adapter connects to `wss://ws-feed.exchange.coinbase.com` (public, no API key), translates Coinbase `match` events to the project's existing tick JSON schema, and exposes them on the same `ws://...:8765/` interface the engine already speaks. So the C++ engine sees identical bytes from either source.
+
+**Drive the timing test (acceptance):**
+```bash
 make end-to-end                       # prints "injected → row written = N ms"
+```
 
-# For the full WS → C++ → … recording, point the engine at the exploit WS:
-make exploit-ws                       # starts ws://localhost:8766/ in this terminal
-# Then in a docker shell (or wherever you can run the C++ binary):
-docker run --rm --network=host -e WS_URL=ws://localhost:8766/ \
-    -e KAFKA_BROKERS=localhost:9092 chainguard-core:dev --engine
+**Fire a controllable shock for the demo recording:**
+```bash
+make swap-to-mock                     # safer for cued exploits
+python3 scripts/exploit-ws.py         # 200-frame flash-loan burst on :8766
+# (point the live engine at the exploit ws temporarily, or rely on the
+#  mock-ticker's --inject-malformed knob to add anomalous frames inline)
+```
 
+**KEDA autoscaling demo (separate from the live pipeline):**
+```bash
+make watch-pods &                     # in one tab
+make flood-kafka                      # 50k records → chainguard-engine scales 1→5
+```
+
+**Airflow retraining DAG demo:**
+```bash
+make airflow-install && make airflow-ui   # http://localhost:8080  admin/admin
+# Trigger chainguard_retraining manually from the UI — spawns a
+# KubernetesPodOperator pod that retrains LightGBM via Purged K-Fold
+# against yesterday's feature_log slice and writes the model into
+# model_registry.
+```
+
+**Teardown:**
+```bash
 make demo-down                        # tear everything down (cluster preserved)
 make demo-down-full                   # also `minikube stop`
 ```
