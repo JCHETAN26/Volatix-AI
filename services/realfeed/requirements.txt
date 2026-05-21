@@ -1,0 +1,2 @@
+# realfeed adapter — only needs the websockets client (sync + server).
+websockets==13.1

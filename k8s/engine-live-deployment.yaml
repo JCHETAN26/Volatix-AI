@@ -1,0 +1,71 @@
+# ChainGuard-Core — live engine Deployment (post-1.0 demo).
+#
+# Runs `chainguard --engine` against an in-cluster WebSocket producer
+# (mock-ticker by default, realfeed for live Coinbase data). Emits
+# FeatureFrame records onto the `financial-features` Kafka topic the
+# classifier already consumes.
+#
+# This is the COMPANION to k8s/deployment.yaml's chainguard-engine
+# (which stays as the KEDA-scaled `--consume` fixture). The live engine
+# is the one that actually drives end-to-end data flow in the dashboard.
+#
+# Swap which producer the engine consumes from with:
+#   make swap-to-realfeed   # live BTC-USD trades from Coinbase
+#   make swap-to-mock        # synthetic 25k tps for controllable demos
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chainguard-engine-live
+  labels:
+    app.kubernetes.io/name: chainguard-engine-live
+    app.kubernetes.io/component: ingest-engine
+    app.kubernetes.io/part-of: chainguard-core
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chainguard-engine-live
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: chainguard-engine-live
+        app.kubernetes.io/component: ingest-engine
+        app.kubernetes.io/part-of: chainguard-core
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        fsGroup: 65532
+      containers:
+        - name: chainguard
+          image: chainguard-core:dev
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--engine"
+            - "--ws-url"
+            - "$(WS_URL)"
+            - "--brokers"
+            - "$(KAFKA_BROKERS)"
+          env:
+            # Default to mock-ticker. `kubectl set env` (wrapped by
+            # `make swap-to-realfeed`) flips this to the realfeed
+            # Service without redeploying anything else.
+            - name: WS_URL
+              value: "ws://mock-ticker.default.svc.cluster.local:8765/"
+            - name: KAFKA_BROKERS
+              value: "chain-kafka.default.svc.cluster.local:9092"
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "2000m"
+              memory: "1Gi"
+          startupProbe:
+            exec:
+              command: ["/usr/local/bin/chainguard", "--version"]
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            failureThreshold: 12

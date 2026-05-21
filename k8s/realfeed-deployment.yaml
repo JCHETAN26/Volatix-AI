@@ -1,0 +1,70 @@
+# ChainGuard-Core — Coinbase WS → ChainGuard tick adapter.
+#
+# Connects to wss://ws-feed.exchange.coinbase.com (public, no API key)
+# and re-emits each filled trade in our existing tick JSON schema on
+# port 8765 — so the engine sees the same wire format whether the
+# source is synthetic (mock-ticker) or live market (this).
+#
+# Default product list is BTC-USD; override via the PRODUCTS env var
+# in this manifest, e.g. "BTC-USD,ETH-USD,SOL-USD".
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: realfeed
+  labels:
+    app.kubernetes.io/name: realfeed
+    app.kubernetes.io/component: tick-source
+    app.kubernetes.io/part-of: chainguard-core
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: realfeed
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: realfeed
+        app.kubernetes.io/component: tick-source
+        app.kubernetes.io/part-of: chainguard-core
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: realfeed
+          image: chainguard-realfeed:dev
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PRODUCTS
+              value: "BTC-USD"
+            - name: PORT
+              value: "8765"
+          ports:
+            - name: ws
+              containerPort: 8765
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: realfeed
+  labels:
+    app.kubernetes.io/name: realfeed
+    app.kubernetes.io/part-of: chainguard-core
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: realfeed
+  ports:
+    - name: ws
+      port: 8765
+      targetPort: ws
