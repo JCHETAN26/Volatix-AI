@@ -63,7 +63,7 @@ export function ReportInspector({
             description="The Settlement & Enforcer writes one row per case into agent_report. Trigger a high-risk frame to populate."
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-[200px,1fr] gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-[200px,minmax(0,1fr)] gap-4">
             <ol className="text-sm divide-y divide-white/5 max-h-80 overflow-auto pr-1">
               {rows.map((row) => (
                 <li key={row.id}>
@@ -88,7 +88,7 @@ export function ReportInspector({
                 </li>
               ))}
             </ol>
-            <div className="space-y-3">
+            <div className="min-w-0 space-y-3">
               {selected ? (
                 <>
                   <div className="flex items-center justify-end">
@@ -101,7 +101,7 @@ export function ReportInspector({
                   </div>
                   <ReceiptCard row={selected} hideContext />
                   <div className="rounded-md bg-bg-subtle/70 border border-white/5 p-4 overflow-auto max-h-[24rem]">
-                    <article className="prose prose-invert prose-sm max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-h1:text-base prose-h2:text-sm prose-h2:uppercase prose-h2:tracking-[0.16em] prose-h2:text-white/60 prose-code:text-accent-amber">
+                    <article className="prose prose-invert prose-sm max-w-none break-words prose-headings:font-semibold prose-headings:tracking-tight prose-h1:text-base prose-h2:text-sm prose-h2:uppercase prose-h2:tracking-[0.16em] prose-h2:text-white/60 prose-code:text-accent-amber prose-pre:whitespace-pre-wrap prose-pre:break-words prose-code:break-words">
                       <ReactMarkdown>{selected.rationale_md || "_(empty)_"}</ReactMarkdown>
                     </article>
                   </div>

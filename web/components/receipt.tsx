@@ -89,14 +89,14 @@ export function ReceiptCard({
   const tl = React.useMemo(() => computeTimeline(row), [row]);
 
   return (
-    <Card className={className}>
+    <Card className={cn("overflow-hidden", className)}>
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <CardTitle>Microsecond Receipt — {row.symbol}</CardTitle>
         <Badge tone={row.enforced ? "red" : "blue"}>
           {row.enforced ? "enforced" : "review"}
         </Badge>
       </CardHeader>
-      <CardBody className="space-y-4">
+      <CardBody className="space-y-4 min-w-0">
         <TimelineStrip timeline={tl} />
         <TotalLine total={tl.total_ns} complete={tl.complete} />
         {!hideContext ? <IndustryContext /> : null}
@@ -107,7 +107,10 @@ export function ReceiptCard({
 
 function TimelineStrip({ timeline }: { timeline: Timeline }) {
   return (
-    <ol className="grid grid-cols-5 gap-2" aria-label="Pipeline stages">
+    <ol
+      className="grid grid-cols-5 gap-2 w-full min-w-0"
+      aria-label="Pipeline stages"
+    >
       {timeline.stages.map((stage, idx) => (
         <StageDot
           key={stage.key}
@@ -131,7 +134,7 @@ function StageDot({
 }) {
   const captured = stage.ts_ns !== null;
   return (
-    <li className="relative flex flex-col items-center text-center">
+    <li className="relative flex min-w-0 flex-col items-center overflow-hidden text-center">
       {/* connector line behind the dot */}
       {!isFirst ? (
         <span
@@ -162,14 +165,14 @@ function StageDot({
         aria-hidden
       />
 
-      <span className="mt-2 text-[10px] font-medium uppercase tracking-[0.16em] text-white/50">
+      <span className="mt-2 max-w-full truncate text-[10px] font-medium uppercase tracking-[0.16em] text-white/50">
         {stage.label}
       </span>
-      <span className="font-mono text-sm text-white/80">
+      <span className="max-w-full truncate font-mono text-sm text-white/80">
         {fmtOffsetLabel(stage.offset_ns)}
       </span>
       {stage.delta_ns !== null ? (
-        <span className="text-[10px] text-white/30">
+        <span className="max-w-full truncate text-[10px] text-white/30">
           +{fmtDuration(stage.delta_ns)}
         </span>
       ) : (

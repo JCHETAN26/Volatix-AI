@@ -207,7 +207,7 @@ export default async function DashboardPage() {
 
       <Receipt initial={receipt} />
 
-      <section className="grid grid-cols-1 lg:grid-cols-[3fr,5fr] gap-6">
+      <section className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr),minmax(0,5fr)] gap-6">
         <ScoreFeed initial={scores} />
         <ReportInspector initial={reports} />
       </section>
