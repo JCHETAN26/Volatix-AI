@@ -35,6 +35,9 @@ k8s/
 scripts/
 web/
 
+# Exceptions: files outside services/ that are still consumed by service Dockerfiles.
+!scripts/mock-ticker.py
+
 # Editor / OS noise
 .DS_Store
 .idea/

@@ -1,13 +1,16 @@
-"""LLM factory with three back-ends.
+"""LLM factory with four back-ends.
 
   LLM_PROVIDER=openai  → ChatOpenAI(model=$LLM_MODEL, default gpt-4o-mini)
+  LLM_PROVIDER=gemini  → ChatGoogleGenerativeAI(model=$LLM_MODEL,
+                                                default gemini-1.5-flash)
   LLM_PROVIDER=ollama  → ChatOllama(model=$OLLAMA_MODEL, default llama3.2:3b,
                                     base_url=$OLLAMA_BASE_URL or http://ollama:11434)
   LLM_PROVIDER=mock    → Deterministic rule-based stand-in for tests and
                          offline runs. No network, no API key.
 
-The mock provider is also the auto-fallback when LLM_PROVIDER is unset and
-OPENAI_API_KEY is missing — so unit tests / CI don't have to know.
+Auto-fallback when LLM_PROVIDER is unset: prefer gemini if GOOGLE_API_KEY,
+else openai if OPENAI_API_KEY, else mock — so unit tests / CI don't have
+to know.
 """
 
 from __future__ import annotations
@@ -106,7 +109,12 @@ def make_chat_llm():
     provider = os.getenv("LLM_PROVIDER", "").lower()
 
     if not provider:
-        provider = "openai" if os.getenv("OPENAI_API_KEY") else "mock"
+        if os.getenv("GOOGLE_API_KEY"):
+            provider = "gemini"
+        elif os.getenv("OPENAI_API_KEY"):
+            provider = "openai"
+        else:
+            provider = "mock"
 
     if provider == "mock":
         return MockChatLLM()
@@ -117,6 +125,23 @@ def make_chat_llm():
 
         return ChatOpenAI(
             model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
+            temperature=float(os.getenv("LLM_TEMPERATURE", "0.0")),
+            timeout=float(os.getenv("LLM_TIMEOUT_S", "30")),
+        )
+
+    if provider == "gemini":
+        from langchain_google_genai import ChatGoogleGenerativeAI  # type: ignore
+
+        # Pass the key explicitly so the library does NOT attempt to fall
+        # through to Application Default Credentials (which would crash the
+        # pod with DefaultCredentialsError on cold start before the user
+        # has injected the key).
+        api_key = os.getenv("GOOGLE_API_KEY") or ""
+        if not api_key:
+            return MockChatLLM()
+        return ChatGoogleGenerativeAI(
+            model=os.getenv("LLM_MODEL", "gemini-1.5-flash"),
+            google_api_key=api_key,
             temperature=float(os.getenv("LLM_TEMPERATURE", "0.0")),
             timeout=float(os.getenv("LLM_TIMEOUT_S", "30")),
         )

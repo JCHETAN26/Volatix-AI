@@ -6,9 +6,11 @@ hand-crafted `FeatureFrame` records directly to the `financial-features`
 topic. Used by `scripts/end-to-end.sh` to measure the classifier → agents
 → Postgres latency without needing a host-side C++ runtime.
 
-The 64-byte binary layout is locked against `src/feature_frame.hpp` (and
-the classifier's `services/classifier/feature_frame.py`). Anomaly-flavored
-defaults: very large OFI, elevated realized vol, lopsided volume.
+The 80-byte v2 binary layout is locked against `src/feature_frame.hpp`
+(and the classifier's `services/classifier/feature_frame.py`). v2 added
+case_id + wire_ts_ns + compute_ts_ns at the tail; the classifier rejects
+anything smaller. Anomaly-flavored defaults: very large OFI, elevated
+realized vol, lopsided volume.
 
 Usage:
     pip install kafka-python
@@ -30,18 +32,20 @@ except ImportError as exc:  # pragma: no cover
     raise SystemExit("missing dependency: pip install kafka-python") from exc
 
 
-# Must stay in sync with src/feature_frame.hpp (#pragma pack(1), 64 bytes).
-_STRUCT = struct.Struct("<HHIq8sddddQ")
-assert _STRUCT.size == 64, f"layout drift: {_STRUCT.size} != 64"
+# Must stay in sync with src/feature_frame.hpp (#pragma pack(1), 80 bytes).
+# v2 trailer: case_id (u64) + wire_ts_ns (i64) + compute_ts_ns (i64).
+_STRUCT = struct.Struct("<HHIq8sddddQqq")
+assert _STRUCT.size == 80, f"layout drift: {_STRUCT.size} != 80"
 
-FRAME_VERSION = 1
+FRAME_VERSION = 2
 TOPIC = "financial-features"
 DEFAULT_BROKERS = "localhost:9092"
 SYMBOL_MAX = 8
 
 
 def _encode(symbol: str, ts_ns: int, *, ofi: float, rv: float,
-            mid: float, total_volume: float, window_count: int) -> bytes:
+            mid: float, total_volume: float, window_count: int,
+            case_id: int) -> bytes:
     sym = symbol.encode("ascii")[:SYMBOL_MAX].ljust(SYMBOL_MAX, b"\x00")
     return _STRUCT.pack(
         FRAME_VERSION,    # version
@@ -53,7 +57,9 @@ def _encode(symbol: str, ts_ns: int, *, ofi: float, rv: float,
         rv,               # realized_vol
         mid,              # mid_price
         total_volume,     # total_volume
-        0,                # _pad1
+        case_id,          # case_id
+        ts_ns,            # wire_ts_ns — same as ts_ns for injector path
+        ts_ns,            # compute_ts_ns
     )
 
 
@@ -84,6 +90,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     t0 = time.monotonic()
+    base_case = time.time_ns()
     for i in range(args.count):
         ts_ns = time.time_ns()
         payload = _encode(
@@ -94,6 +101,7 @@ def main(argv: list[str] | None = None) -> int:
             mid=args.mid_price + i * 0.05,   # tiny ramp so RV stays positive downstream
             total_volume=args.total_volume,
             window_count=args.window_count,
+            case_id=base_case + i,           # unique per inject frame
         )
         producer.send(args.topic, key=args.symbol.encode("ascii"), value=payload)
     producer.flush(timeout=5.0)

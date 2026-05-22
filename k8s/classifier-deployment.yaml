@@ -66,6 +66,27 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 1000
+      initContainers:
+        # The PVC overlays /models, hiding the baseline model baked into the
+        # image. Seed the PVC from /app/classifier/models if /models is empty
+        # so the classifier has a model on cold start. Airflow retraining
+        # later overwrites /models/baseline.txt in-place.
+        - name: seed-baseline-model
+          image: chainguard-classifier:dev
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -s /models/baseline.txt ]; then
+                cp /app/classifier/models/baseline.txt /models/baseline.txt
+                echo "seeded /models/baseline.txt"
+              else
+                echo "/models/baseline.txt already present"
+              fi
+          volumeMounts:
+            - name: models
+              mountPath: /models
       containers:
         - name: classifier
           image: chainguard-classifier:dev

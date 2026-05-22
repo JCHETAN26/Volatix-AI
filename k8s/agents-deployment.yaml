@@ -8,20 +8,13 @@
 # automatically falls back to LLM_PROVIDER=mock if OPENAI_API_KEY is
 # missing, so the pod won't crash-loop while you wire up credentials.
 
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: chainguard-agents-secrets
-  labels:
-    app.kubernetes.io/name: chainguard-agents
-    app.kubernetes.io/part-of: chainguard-core
-type: Opaque
-# Apply with:
-#   kubectl create secret generic chainguard-agents-secrets \
-#       --from-literal=OPENAI_API_KEY=sk-... --dry-run=client -o yaml | kubectl apply -f -
-stringData:
-  OPENAI_API_KEY: ""
+# Note: the chainguard-agents-secrets Secret is intentionally NOT declared
+# here. Re-applying this file would otherwise overwrite real key values with
+# empty strings. Create / update it out-of-band via:
+#   scripts/set-openai-key.sh   # OpenAI
+#   scripts/set-google-key.sh   # Gemini
+# The Deployment references it with `optional: true` so the pod boots fine
+# before the Secret exists (auto-falls back to MockChatLLM).
 
 ---
 apiVersion: v1
@@ -39,8 +32,8 @@ data:
   WRITE_POSTGRES: "true"
   QDRANT_URL: "http://vector-db.default.svc.cluster.local:6333"
   QDRANT_COLLECTION: "attack_vectors"
-  LLM_PROVIDER: ""        # blank → auto-select openai / mock by OPENAI_API_KEY
-  LLM_MODEL: "gpt-4o-mini"
+  LLM_PROVIDER: ""        # blank → auto-select gemini / openai / mock by which key is present
+  LLM_MODEL: "gemini-2.5-flash"
 
 ---
 apiVersion: apps/v1
@@ -85,6 +78,12 @@ spec:
                 secretKeyRef:
                   name: chainguard-agents-secrets
                   key: OPENAI_API_KEY
+                  optional: true
+            - name: GOOGLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: chainguard-agents-secrets
+                  key: GOOGLE_API_KEY
                   optional: true
           resources:
             requests:
