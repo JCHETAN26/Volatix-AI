@@ -81,8 +81,13 @@ ok "Helm repo cache refreshed"
 # 3. Kafka
 # ---------------------------------------------------------------------------
 log "Installing/Upgrading Kafka release '${KAFKA_RELEASE}'"
+# Bitnami moved their free Docker Hub images to bitnamilegacy/ in Aug 2025.
+# Pin the registry override here so the chart pulls images that actually exist.
 helm upgrade --install "${KAFKA_RELEASE}" bitnami/kafka \
     --namespace "${NAMESPACE}" \
+    --set global.security.allowInsecureImages=true \
+    --set image.registry=docker.io \
+    --set image.repository=bitnamilegacy/kafka \
     --set listeners.client.protocol=PLAINTEXT \
     --set listeners.controller.protocol=PLAINTEXT \
     --set listeners.interbroker.protocol=PLAINTEXT \
