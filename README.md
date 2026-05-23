@@ -325,6 +325,7 @@ Implementation follows the strict sequence defined in `build-plan.md`. Each phas
 | 3 | Days 7–9 | Multi-stage Docker (<150MB), Helm deploy, KEDA autoscaling on consumer lag |
 | 4 | Days 10–12 | LightGBM streaming classifier, Airflow Purged K-Fold retraining, 3-tier LangGraph agents |
 | 5 | Days 13–14 | Next.js 15 control board, end-to-end flash-loan exploit simulation, v1.0.0 tag |
+| 6 | Days 15–21 | LLM evaluation & observability: Ragas-backed nightly eval DAG, prompt-versioned regression dashboard |
 
 ---
 
@@ -336,6 +337,44 @@ Implementation follows the strict sequence defined in `build-plan.md`. Each phas
 - Container image footprint: **< 150 MB**
 - End-to-end exploit interception (capture → classify → agent decision → ledger lock): **< 1 second**
 - Dashboard render: **60 fps**
+
+---
+
+## LLM Evaluation & Observability (Phase 6)
+
+A nightly evaluation harness around the LangGraph agent cluster — the difference
+between *shipping an LLM demo* and *running LLMs in production*.
+
+- **Curated fixture** (`services/agents/eval/fixtures/cases.json`) — 200
+  hand-labeled cases generated from the 10-class attack-vector taxonomy in
+  the Qdrant seed, with controlled jitter around each centroid. Each case
+  has `expected_action ∈ {FREEZE, MONITOR, NO_ACTION}`, an
+  `expected_reason_code`, and a `difficulty` tag (easy / borderline / hard).
+- **Replay runner** (`services/agents/eval/runner.py`) — invokes the agent
+  graph directly (bypasses Kafka) against every case, captures the full
+  agent output + Qdrant RAG context.
+- **Ragas + binary metrics**:
+  - `faithfulness` — does the auditor's rationale cite the RAG-retrieved
+    attack vectors, or invent its own?
+  - `answer_relevancy` — does the rationale address the actual feature
+    vector, or wander?
+  - `freeze_correctness` — binary match of the Enforcer's action vs. the
+    fixture label.
+  - p50 / p95 stage latency.
+- **Prompt version tagging** — every `agent_report` row carries a
+  `prompt_version` column; the eval runner records `(prompt_version,
+  fixture_revision)` so regression is per-version, not per-day.
+- **Nightly Airflow DAG** (`chainguard_eval`) — same Airflow infra as the
+  LightGBM retraining DAG; one KubernetesPodOperator runs the eval runner
+  against the latest prompt version and writes results to `eval_run` +
+  `eval_case_result`.
+- **`/eval` dashboard** — Next.js page with metric-per-version line charts,
+  red flags on regression, per-case drilldown showing prompt + RAG context
+  + agent output + label + Ragas scores.
+
+The point: catch the failure mode where **FREEZE accuracy holds at 94% but
+faithfulness drops 0.21** — the agent picks the right action via gut, not
+via evidence — *before* the prompt change reaches production.
 
 ---
 
