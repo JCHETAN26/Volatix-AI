@@ -11,3 +11,9 @@ pydantic==2.10.4
 httpx==0.28.1
 kafka-python-ng==2.2.3
 psycopg2-binary==2.9.10
+# Phase 6 — LLM evaluation harness. Only imported by agents.eval.*; the
+# streaming consumer never touches it. Ragas brings in datasets +
+# langchain extras, adding ~80MB to the agents image but keeping the
+# eval runner in the same container as the agent code it tests.
+ragas==0.2.10
+datasets==3.2.0

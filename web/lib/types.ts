@@ -85,3 +85,50 @@ export interface FeatureLogRow {
 }
 
 export type LedgerStatus = "SECURED" | "MONITORING" | "OFFLINE";
+
+// Phase 6 — LLM evaluation tables.
+
+export interface EvalRunRow {
+  id: number;
+  created_at: string;
+  prompt_version: string;
+  fixture_revision: string;
+  llm_provider: string;
+  llm_model: string;
+  n_cases: number;
+  freeze_correctness: number | null;
+  faithfulness: number | null;
+  answer_relevancy: number | null;
+  p50_latency_ms: number | null;
+  p95_latency_ms: number | null;
+  notes: string | null;
+}
+
+export interface EvalCaseResultRow {
+  id: number;
+  eval_run_id: number;
+  case_id: string;            // fixture-local id, e.g. "av-001-03"
+  expected_action: string;    // FREEZE | MONITOR | NO_ACTION
+  actual_action: string | null;
+  correct: boolean;
+  faithfulness: number | null;
+  answer_relevancy: number | null;
+  latency_ms: number | null;
+  agent_output: {
+    rationale_md?: string;
+    confidence?: number;
+    enforcement_action?: {
+      action: string;
+      target: string;
+      reason_code: string;
+      notes?: string;
+    } | null;
+    rag_matches?: Array<{
+      attack_id: string;
+      name: string;
+      severity: number;
+      similarity: number;
+    }>;
+    error?: string;
+  };
+}

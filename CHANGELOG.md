@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+### Phase 6 — LLM evaluation & observability
+
+- **New `eval_run` + `eval_case_result` tables on Supabase** (via
+  `scripts/sql/init.sql`). Every `agent_report` row now also carries a
+  `prompt_version VARCHAR(32)` column, defaulting to `'v0'` so the
+  historical rows backfill automatically.
+- **Curated fixture** at `services/agents/eval/fixtures/cases.json` —
+  200 cases generated deterministically from the 10 attack-vector
+  centroids in the Qdrant seed (20 per class). Mix is realistic:
+  60 FREEZE / 100 MONITOR / 40 NO_ACTION; 100 easy / 60 borderline /
+  40 hard. Re-running `python -m agents.eval.fixtures.build` is
+  byte-identical.
+- **Replay runner** at `services/agents/eval/runner.py` — invokes the
+  LangGraph cluster directly (bypassing Kafka), captures full agent
+  output + Qdrant RAG context, scores each case with Ragas (faithfulness
+  + answer_relevancy) and a binary `freeze_correctness` against the
+  fixture label.
+- **Nightly Airflow DAG** `chainguard_eval` (`airflow/dags/chainguard_eval.py`)
+  — KubernetesPodOperator spawns a 3GB pod from the agents image, runs
+  the eval, writes one `eval_run` row + 200 `eval_case_result` rows.
+  Schedule: 03:00 UTC daily, 1h after the LightGBM retraining DAG.
+- **`/eval` dashboard** at `web/app/eval/` — Next.js page with metric
+  trends per prompt version (inline-SVG sparklines, zero chart deps),
+  a per-case drilldown, and a regression banner that flags any metric
+  dropping >5% vs. the prior run for the same prompt version. Catches
+  the failure mode where freeze accuracy holds but Ragas faithfulness
+  silently drops — the exact regression that gets LLM features pulled
+  from production.
+- **Ragas notes**: `ragas==0.2.10` + `datasets==3.2.0` added to the
+  agents service deps; embedder defaults to `models/gemini-embedding-001`
+  on the v1beta API (overridable via `$EVAL_EMBED_MODEL` — both
+  `text-embedding-004` and `embedding-001` returned 404 on v1beta as of
+  May 2026). `answer_relevancy` is dropped from the metrics list when no
+  embedder is configured rather than NaN-ing the table.
+
 ### Architecture
 
 - **Postgres moves to Supabase (managed).** The in-cluster Bitnami

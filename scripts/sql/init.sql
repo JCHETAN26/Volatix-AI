@@ -101,4 +101,53 @@ CREATE INDEX IF NOT EXISTS feature_log_case_idx        ON feature_log (case_id);
 CREATE INDEX IF NOT EXISTS anomaly_score_log_case_idx  ON anomaly_score_log (case_id);
 CREATE INDEX IF NOT EXISTS agent_report_pipeline_idx   ON agent_report (pipeline_case_id);
 
+-- ===========================================================================
+-- Phase 6 — LLM evaluation & observability.
+-- prompt_version on agent_report: which prompt template / model / temp
+-- produced this row. Backfills historical rows as 'v0' so per-version
+-- regression queries don't need to special-case nulls. The nightly
+-- eval DAG writes one eval_run per (prompt_version, fixture_revision)
+-- with the rolled-up Ragas + freeze_correctness metrics; eval_case_result
+-- holds the per-case scores so the dashboard can drill down.
+-- ===========================================================================
+
+ALTER TABLE agent_report
+    ADD COLUMN IF NOT EXISTS prompt_version VARCHAR(32) NOT NULL DEFAULT 'v0';
+CREATE INDEX IF NOT EXISTS agent_report_prompt_version_idx
+    ON agent_report (prompt_version, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS eval_run (
+    id                BIGSERIAL PRIMARY KEY,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    prompt_version    VARCHAR(32) NOT NULL,
+    fixture_revision  VARCHAR(64) NOT NULL,  -- sha256 of cases.json
+    llm_provider      VARCHAR(32) NOT NULL,
+    llm_model         VARCHAR(64) NOT NULL,
+    n_cases           INTEGER     NOT NULL,
+    -- rolled-up metrics across all cases
+    freeze_correctness DOUBLE PRECISION,     -- binary match vs. expected_action
+    faithfulness       DOUBLE PRECISION,     -- Ragas, vs. RAG context
+    answer_relevancy   DOUBLE PRECISION,     -- Ragas, vs. feature vector
+    p50_latency_ms     DOUBLE PRECISION,
+    p95_latency_ms     DOUBLE PRECISION,
+    notes              TEXT
+);
+CREATE INDEX IF NOT EXISTS eval_run_version_idx
+    ON eval_run (prompt_version, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS eval_case_result (
+    id                BIGSERIAL PRIMARY KEY,
+    eval_run_id       BIGINT NOT NULL REFERENCES eval_run (id) ON DELETE CASCADE,
+    case_id           VARCHAR(64) NOT NULL,        -- fixture-local id
+    expected_action   VARCHAR(16) NOT NULL,        -- FREEZE | MONITOR | NO_ACTION
+    actual_action     VARCHAR(16),
+    correct           BOOLEAN NOT NULL,
+    faithfulness      DOUBLE PRECISION,
+    answer_relevancy  DOUBLE PRECISION,
+    latency_ms        DOUBLE PRECISION,
+    agent_output      JSONB NOT NULL DEFAULT '{}'::JSONB
+);
+CREATE INDEX IF NOT EXISTS eval_case_result_run_idx
+    ON eval_case_result (eval_run_id);
+
 COMMIT;

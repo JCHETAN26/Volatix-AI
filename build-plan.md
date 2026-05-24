@@ -316,6 +316,131 @@ helm version
 
 ---
 
+## Phase 6 — LLM Evaluation & Observability
+**Window:** Days 15–21 (post-1.0)
+**Goal:** Add a production-grade evaluation harness around the LangGraph
+agent cluster so prompt and model changes can be measured for *regression*
+before they reach production. This is the deliverable that separates
+"shipped an LLM demo" from "operating an LLM service."
+
+### Task 6.1 — Schema & Prompt Versioning
+**Deliverable:** A `prompt_version` column on `agent_report` plus two new
+tables for evaluation results.
+
+**Steps**
+- Add `prompt_version VARCHAR(32) NOT NULL DEFAULT 'v0'` to `agent_report`;
+  backfill historical rows as `v0` (the default covers them).
+- Create `eval_run` (one row per nightly run, rolled-up metrics) and
+  `eval_case_result` (one row per fixture case, per-case scores).
+- Index `(prompt_version, created_at DESC)` so per-version queries don't
+  full-scan.
+
+**Acceptance**
+- `make init-postgres` is idempotent against the new schema.
+- The existing agent service writes to the new column without code changes
+  (default covers it; explicit value added in Task 6.3).
+
+---
+
+### Task 6.2 — Curated Fixture
+**Deliverable:** `services/agents/eval/fixtures/cases.json` — 200 cases
+covering the 10 attack-vector classes already in the Qdrant seed.
+
+**Steps**
+- Programmatic generator at `services/agents/eval/fixtures/build.py`.
+  For each of the 10 seed centroids, jitter feature values with a seeded
+  RNG to produce 20 variants (controlled drift; some easy, some borderline).
+- Assign `expected_action` from each centroid's `severity`:
+  - severity ≥ 0.9 → `FREEZE`
+  - severity 0.6–0.85 → `MONITOR`
+  - severity < 0.5 → `NO_ACTION`
+- Compute a fixture revision hash (sha256 of the sorted JSON) so
+  `eval_run` records lock to a specific fixture state.
+
+**Acceptance**
+- `python -m agents.eval.fixtures.build` is deterministic — re-running
+  produces a byte-identical `cases.json`.
+- `agents.eval.fixtures.load_cases()` returns 200 fully-populated cases.
+
+---
+
+### Task 6.3 — Replay Runner + Ragas Integration
+**Deliverable:** A standalone runner that replays the fixture through the
+agent graph (bypassing Kafka) and scores each case with Ragas + binary
+correctness.
+
+**Steps**
+- `services/agents/eval/runner.py`:
+  1. Loads the fixture.
+  2. Instantiates the LangGraph cluster with current
+     `(LLM_PROVIDER, LLM_MODEL, PROMPT_VERSION)`.
+  3. For each case: invokes the graph, captures full output + Qdrant
+     RAG context, measures per-stage wall-clock latency.
+  4. Computes Ragas metrics:
+     - `faithfulness` — auditor rationale vs. RAG-retrieved context.
+     - `answer_relevancy` — rationale vs. case's feature vector.
+  5. Computes `freeze_correctness` — boolean match of Enforcer action vs.
+     `expected_action`.
+  6. Writes one `eval_run` row + N `eval_case_result` rows.
+- Stamp `prompt_version` on the agent code (`PROMPT_VERSION` env var,
+  injected by the K8s manifest), so the runner records which version
+  every output came from.
+
+**Acceptance**
+- `python -m agents.eval.runner` against the live cluster produces an
+  `eval_run` row with non-null metrics and 200 case results.
+- Re-running with the same `prompt_version` against the same fixture
+  produces metrics within ±5% (LLM nondeterminism budget).
+
+---
+
+### Task 6.4 — Nightly Airflow DAG
+**Deliverable:** `airflow/dags/chainguard_eval.py` — runs the eval runner
+nightly via KubernetesPodOperator, same pattern as the existing LightGBM
+retraining DAG.
+
+**Steps**
+- New DAG with one task: KubernetesPodOperator running
+  `python -m agents.eval.runner` inside the agents container image.
+- Schedule: daily after the retraining DAG completes (so the agent has
+  the latest classifier upstream).
+- Failure surfaces to Airflow's standard alerting.
+
+**Acceptance**
+- Manual trigger in the Airflow UI runs to success and writes an
+  `eval_run` row.
+- The scheduled run fires at the next cron tick without intervention.
+
+---
+
+### Task 6.5 — `/eval` Dashboard
+**Deliverable:** A new Next.js route surfacing per-version eval results
+so regressions are visible without `psql`.
+
+**Steps**
+- New route `web/app/eval/page.tsx` + API at
+  `web/app/api/eval/route.ts`.
+- Metric-over-time line chart per prompt version (faithfulness,
+  answer_relevancy, freeze_correctness, p95 latency).
+- Regression flag: red banner when the latest run regresses any metric
+  by > 5% vs. the prior run for the same prompt version.
+- Per-case drilldown: clicking a run shows the 200 case results with
+  prompt, RAG context, agent output, expected vs. actual action, and
+  Ragas scores side-by-side.
+
+**Acceptance**
+- Page renders with the current `eval_run` table state, no errors.
+- Changing the auditor system prompt and re-running the eval shows up
+  as a regression flag in the dashboard.
+
+### ✅ Phase 6 Definition of Done
+- Schema + fixture + runner + DAG + dashboard all land.
+- One demonstrable prompt regression is captured in the screenshot
+  used for portfolio + resume copy.
+- **Stop here.** Cut a v1.1.0 tag and update CHANGELOG.
+
+---
+
 ## Out of Scope for MVP
 
 The following are intentionally excluded to prevent scope creep:
@@ -340,3 +465,4 @@ The following are intentionally excluded to prevent scope creep:
 | 3 | Days 7–9 | Multi-stage Docker, KEDA autoscaling | Image <150 MB, scales on lag |
 | 4 | Days 10–12 | LightGBM streaming, Airflow Purged K-Fold, 3-tier LangGraph | Agents log to Postgres |
 | 5 | Days 13–14 | Next.js 15 dashboard, flash-loan exploit sim | End-to-end <1 s, v1.0.0 |
+| 6 | Days 15–21 | Ragas eval harness + nightly Airflow DAG + /eval dashboard | Regression detected per prompt version |

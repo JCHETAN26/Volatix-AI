@@ -1,0 +1,3207 @@
+{
+  "cases": [
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-00",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 191.7995,
+        "ofi": 9559.3411,
+        "realized_vol": 0.044005,
+        "total_volume": 67532.9584,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-01",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 191.4495,
+        "ofi": 9088.6422,
+        "realized_vol": 0.044233,
+        "total_volume": 62304.6718,
+        "window_count": 120
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-02",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 192.4568,
+        "ofi": 9049.2068,
+        "realized_vol": 0.043081,
+        "total_volume": 68155.3195,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-03",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 191.0645,
+        "ofi": 9312.0658,
+        "realized_vol": 0.044644,
+        "total_volume": 64892.1341,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-04",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 191.5348,
+        "ofi": 9045.901,
+        "realized_vol": 0.045488,
+        "total_volume": 63054.6832,
+        "window_count": 121
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-05",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 192.1464,
+        "ofi": 9045.2749,
+        "realized_vol": 0.044249,
+        "total_volume": 67296.5927,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-06",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 192.8657,
+        "ofi": 9715.6102,
+        "realized_vol": 0.04518,
+        "total_volume": 66153.8736,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-07",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 192.5351,
+        "ofi": 9521.6243,
+        "realized_vol": 0.044963,
+        "total_volume": 65192.2129,
+        "window_count": 120
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-08",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 192.1659,
+        "ofi": 9432.4975,
+        "realized_vol": 0.043462,
+        "total_volume": 66371.7978,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-09",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 191.2579,
+        "ofi": 9733.71,
+        "realized_vol": 0.045612,
+        "total_volume": 67010.5196,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-10",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 193.2452,
+        "ofi": 9855.6819,
+        "realized_vol": 0.050652,
+        "total_volume": 67724.1911,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-11",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 190.4758,
+        "ofi": 8689.7893,
+        "realized_vol": 0.041248,
+        "total_volume": 60238.4326,
+        "window_count": 114
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-12",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 189.3274,
+        "ofi": 7866.9787,
+        "realized_vol": 0.039946,
+        "total_volume": 62384.7749,
+        "window_count": 122
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-13",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 195.3327,
+        "ofi": 8976.7274,
+        "realized_vol": 0.039849,
+        "total_volume": 67823.7421,
+        "window_count": 122
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-14",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 193.719,
+        "ofi": 8313.4988,
+        "realized_vol": 0.050443,
+        "total_volume": 58978.1861,
+        "window_count": 116
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-15",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 192.3186,
+        "ofi": 11049.131,
+        "realized_vol": 0.045903,
+        "total_volume": 63338.3901,
+        "window_count": 121
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-16",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 187.6141,
+        "ofi": 6761.975,
+        "realized_vol": 0.029125,
+        "total_volume": 53850.3938,
+        "window_count": 105
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-17",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 185.2445,
+        "ofi": 11911.1093,
+        "realized_vol": 0.045747,
+        "total_volume": 78994.6631,
+        "window_count": 108
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-18",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 187.3434,
+        "ofi": 6497.8075,
+        "realized_vol": 0.055444,
+        "total_volume": 50201.4278,
+        "window_count": 122
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (long side)",
+      "attack_id": "av-001",
+      "case_id": "av-001-19",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-001",
+      "features": {
+        "mid_price": 189.3757,
+        "ofi": 8459.2665,
+        "realized_vol": 0.03952,
+        "total_volume": 80686.7092,
+        "window_count": 123
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-00",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 191.8467,
+        "ofi": -9947.6105,
+        "realized_vol": 0.044565,
+        "total_volume": 64091.3642,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-01",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 191.879,
+        "ofi": -9879.5308,
+        "realized_vol": 0.045565,
+        "total_volume": 65875.1379,
+        "window_count": 120
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-02",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 192.219,
+        "ofi": -9116.1872,
+        "realized_vol": 0.046226,
+        "total_volume": 64172.1386,
+        "window_count": 121
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-03",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 191.6017,
+        "ofi": -9809.3038,
+        "realized_vol": 0.043201,
+        "total_volume": 65283.2506,
+        "window_count": 120
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-04",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 192.7807,
+        "ofi": -9861.6193,
+        "realized_vol": 0.043292,
+        "total_volume": 65811.4564,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-05",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 191.7856,
+        "ofi": -9907.3282,
+        "realized_vol": 0.046084,
+        "total_volume": 66578.4777,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-06",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 192.8333,
+        "ofi": -9316.8619,
+        "realized_vol": 0.042985,
+        "total_volume": 65666.5064,
+        "window_count": 121
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-07",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 191.6281,
+        "ofi": -9352.8333,
+        "realized_vol": 0.043762,
+        "total_volume": 61997.2554,
+        "window_count": 118
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-08",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 191.0637,
+        "ofi": -9431.7395,
+        "realized_vol": 0.044434,
+        "total_volume": 67745.4471,
+        "window_count": 118
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-09",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 191.9137,
+        "ofi": -9830.5894,
+        "realized_vol": 0.047077,
+        "total_volume": 62967.4836,
+        "window_count": 120
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-10",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 188.8834,
+        "ofi": -10021.8752,
+        "realized_vol": 0.051044,
+        "total_volume": 57349.0209,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-11",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 190.6111,
+        "ofi": -10653.8473,
+        "realized_vol": 0.048695,
+        "total_volume": 68117.3081,
+        "window_count": 123
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-12",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 190.6023,
+        "ofi": -9126.8359,
+        "realized_vol": 0.050602,
+        "total_volume": 63116.4561,
+        "window_count": 120
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-13",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 189.9481,
+        "ofi": -9132.3566,
+        "realized_vol": 0.04644,
+        "total_volume": 60928.3751,
+        "window_count": 126
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-14",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 195.4549,
+        "ofi": -10835.9844,
+        "realized_vol": 0.051599,
+        "total_volume": 64940.2415,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-15",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 189.8454,
+        "ofi": -9657.7069,
+        "realized_vol": 0.049657,
+        "total_volume": 55301.0452,
+        "window_count": 125
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-16",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 191.4171,
+        "ofi": -11522.7202,
+        "realized_vol": 0.0445,
+        "total_volume": 64209.5207,
+        "window_count": 120
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-17",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 198.2474,
+        "ofi": -6484.1586,
+        "realized_vol": 0.048799,
+        "total_volume": 78117.421,
+        "window_count": 118
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-18",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 189.8585,
+        "ofi": -6996.4265,
+        "realized_vol": 0.055965,
+        "total_volume": 66493.9633,
+        "window_count": 117
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Flash-Loan Imbalance (short side)",
+      "attack_id": "av-002",
+      "case_id": "av-002-19",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-002",
+      "features": {
+        "mid_price": 187.0266,
+        "ofi": -9065.8425,
+        "realized_vol": 0.027524,
+        "total_volume": 45626.3355,
+        "window_count": 119
+      },
+      "severity": 0.95
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-00",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 190.5506,
+        "ofi": 195.8994,
+        "realized_vol": 0.00484,
+        "total_volume": 81010.1269,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-01",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 189.0875,
+        "ofi": 195.3265,
+        "realized_vol": 0.005002,
+        "total_volume": 82457.9883,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-02",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 189.9415,
+        "ofi": 207.5651,
+        "realized_vol": 0.005053,
+        "total_volume": 80764.8749,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-03",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 190.1913,
+        "ofi": 195.0483,
+        "realized_vol": 0.00519,
+        "total_volume": 76370.1816,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-04",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 189.1819,
+        "ofi": 201.9601,
+        "realized_vol": 0.005227,
+        "total_volume": 77762.0383,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-05",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 190.1141,
+        "ofi": 196.6729,
+        "realized_vol": 0.004806,
+        "total_volume": 79950.829,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-06",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 189.5105,
+        "ofi": 199.2839,
+        "realized_vol": 0.005077,
+        "total_volume": 77963.7442,
+        "window_count": 59
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-07",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 190.3709,
+        "ofi": 195.6866,
+        "realized_vol": 0.005198,
+        "total_volume": 78754.0527,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-08",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 189.2537,
+        "ofi": 209.678,
+        "realized_vol": 0.005242,
+        "total_volume": 80313.0179,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-09",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 190.0368,
+        "ofi": 204.059,
+        "realized_vol": 0.00508,
+        "total_volume": 76178.8129,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-10",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 191.127,
+        "ofi": 229.5712,
+        "realized_vol": 0.004867,
+        "total_volume": 93254.5138,
+        "window_count": 57
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-11",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 189.3805,
+        "ofi": 200.0449,
+        "realized_vol": 0.004219,
+        "total_volume": 83172.2107,
+        "window_count": 58
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-12",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 190.2159,
+        "ofi": 196.3244,
+        "realized_vol": 0.004856,
+        "total_volume": 89812.8303,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-13",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 190.0173,
+        "ofi": 203.3814,
+        "realized_vol": 0.004131,
+        "total_volume": 81002.5722,
+        "window_count": 60
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-14",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 189.6037,
+        "ofi": 218.683,
+        "realized_vol": 0.004981,
+        "total_volume": 94332.7305,
+        "window_count": 58
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-15",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 191.775,
+        "ofi": 189.8705,
+        "realized_vol": 0.004751,
+        "total_volume": 74512.2045,
+        "window_count": 58
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-16",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 193.6892,
+        "ofi": 243.5193,
+        "realized_vol": 0.003457,
+        "total_volume": 60627.5269,
+        "window_count": 67
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-17",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 190.8703,
+        "ofi": 170.0498,
+        "realized_vol": 0.005181,
+        "total_volume": 86362.4256,
+        "window_count": 61
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-18",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 183.9408,
+        "ofi": 134.9209,
+        "realized_vol": 0.005376,
+        "total_volume": 69846.3634,
+        "window_count": 55
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Wash-Trading Pattern",
+      "attack_id": "av-003",
+      "case_id": "av-003-19",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-003",
+      "features": {
+        "mid_price": 194.721,
+        "ofi": 181.9363,
+        "realized_vol": 0.005629,
+        "total_volume": 87040.6751,
+        "window_count": 61
+      },
+      "severity": 0.7
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-00",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 209.9127,
+        "ofi": 5321.4175,
+        "realized_vol": 0.068607,
+        "total_volume": 45434.6429,
+        "window_count": 109
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-01",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 210.9408,
+        "ofi": 5461.9421,
+        "realized_vol": 0.066808,
+        "total_volume": 44651.1782,
+        "window_count": 110
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-02",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 210.8646,
+        "ofi": 5687.5773,
+        "realized_vol": 0.07099,
+        "total_volume": 44991.4495,
+        "window_count": 110
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-03",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 209.4039,
+        "ofi": 5416.564,
+        "realized_vol": 0.069036,
+        "total_volume": 44984.7985,
+        "window_count": 110
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-04",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 210.9542,
+        "ofi": 5769.7957,
+        "realized_vol": 0.072159,
+        "total_volume": 44981.2289,
+        "window_count": 110
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-05",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 209.8128,
+        "ofi": 5430.8559,
+        "realized_vol": 0.073348,
+        "total_volume": 46187.1482,
+        "window_count": 109
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-06",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 209.2021,
+        "ofi": 5617.7658,
+        "realized_vol": 0.070007,
+        "total_volume": 43852.1398,
+        "window_count": 111
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-07",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 209.5859,
+        "ofi": 5419.2297,
+        "realized_vol": 0.072144,
+        "total_volume": 43875.6743,
+        "window_count": 109
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-08",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 210.8196,
+        "ofi": 5525.144,
+        "realized_vol": 0.069992,
+        "total_volume": 44017.8284,
+        "window_count": 111
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-09",
+      "difficulty": "easy",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 209.2766,
+        "ofi": 5770.91,
+        "realized_vol": 0.070837,
+        "total_volume": 44711.006,
+        "window_count": 108
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-10",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 209.2295,
+        "ofi": 4989.6706,
+        "realized_vol": 0.079259,
+        "total_volume": 49981.3871,
+        "window_count": 104
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-11",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 212.8757,
+        "ofi": 6435.719,
+        "realized_vol": 0.061219,
+        "total_volume": 38189.9953,
+        "window_count": 107
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-12",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 209.7624,
+        "ofi": 5186.9821,
+        "realized_vol": 0.070689,
+        "total_volume": 38624.4796,
+        "window_count": 113
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-13",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 211.026,
+        "ofi": 6134.3357,
+        "realized_vol": 0.067969,
+        "total_volume": 49567.0393,
+        "window_count": 108
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-14",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 210.4816,
+        "ofi": 6328.0707,
+        "realized_vol": 0.066739,
+        "total_volume": 38151.7474,
+        "window_count": 104
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-15",
+      "difficulty": "borderline",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 211.4336,
+        "ofi": 5749.9108,
+        "realized_vol": 0.071093,
+        "total_volume": 44031.4109,
+        "window_count": 114
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-16",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 210.3452,
+        "ofi": 5420.8344,
+        "realized_vol": 0.052428,
+        "total_volume": 44783.937,
+        "window_count": 111
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-17",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 216.2434,
+        "ofi": 6793.27,
+        "realized_vol": 0.044643,
+        "total_volume": 29622.7285,
+        "window_count": 120
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-18",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 213.0877,
+        "ofi": 5407.2606,
+        "realized_vol": 0.085212,
+        "total_volume": 56640.7972,
+        "window_count": 122
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Pump-and-Dump Spike",
+      "attack_id": "av-004",
+      "case_id": "av-004-19",
+      "difficulty": "hard",
+      "expected_action": "FREEZE",
+      "expected_reason_code": "MATCH_AV-004",
+      "features": {
+        "mid_price": 205.795,
+        "ofi": 6051.9304,
+        "realized_vol": 0.04724,
+        "total_volume": 46713.2153,
+        "window_count": 102
+      },
+      "severity": 0.9
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-00",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 187.3848,
+        "ofi": -5837.0206,
+        "realized_vol": 0.056035,
+        "total_volume": 49987.1419,
+        "window_count": 99
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-01",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 186.7258,
+        "ofi": -5875.4326,
+        "realized_vol": 0.054754,
+        "total_volume": 51944.7364,
+        "window_count": 99
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-02",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 187.7801,
+        "ofi": -5883.2922,
+        "realized_vol": 0.055427,
+        "total_volume": 52269.6055,
+        "window_count": 100
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-03",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 187.4581,
+        "ofi": -5751.6433,
+        "realized_vol": 0.055874,
+        "total_volume": 48088.142,
+        "window_count": 99
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-04",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 186.4365,
+        "ofi": -5981.5642,
+        "realized_vol": 0.054936,
+        "total_volume": 49895.7139,
+        "window_count": 101
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-05",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 187.1692,
+        "ofi": -6006.8239,
+        "realized_vol": 0.055201,
+        "total_volume": 47644.9204,
+        "window_count": 101
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-06",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 186.8768,
+        "ofi": -5771.8542,
+        "realized_vol": 0.053041,
+        "total_volume": 47864.3556,
+        "window_count": 101
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-07",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 186.6918,
+        "ofi": -5841.2322,
+        "realized_vol": 0.055412,
+        "total_volume": 51616.8118,
+        "window_count": 99
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-08",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 186.2194,
+        "ofi": -6036.958,
+        "realized_vol": 0.054686,
+        "total_volume": 49114.7065,
+        "window_count": 100
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-09",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 187.1484,
+        "ofi": -5982.2322,
+        "realized_vol": 0.057441,
+        "total_volume": 49891.5555,
+        "window_count": 101
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-10",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 185.9241,
+        "ofi": -5491.8301,
+        "realized_vol": 0.06467,
+        "total_volume": 47306.4947,
+        "window_count": 103
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-11",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 185.5398,
+        "ofi": -5797.4829,
+        "realized_vol": 0.048726,
+        "total_volume": 45882.35,
+        "window_count": 100
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-12",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 185.9672,
+        "ofi": -6275.4729,
+        "realized_vol": 0.0561,
+        "total_volume": 44721.5087,
+        "window_count": 101
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-13",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 186.4097,
+        "ofi": -5539.1546,
+        "realized_vol": 0.0603,
+        "total_volume": 57861.7438,
+        "window_count": 105
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-14",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 184.833,
+        "ofi": -5778.9424,
+        "realized_vol": 0.052296,
+        "total_volume": 50532.2151,
+        "window_count": 102
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-15",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 186.0014,
+        "ofi": -5044.0168,
+        "realized_vol": 0.059213,
+        "total_volume": 50897.8494,
+        "window_count": 99
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-16",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 180.4578,
+        "ofi": -6846.6699,
+        "realized_vol": 0.059321,
+        "total_volume": 53844.108,
+        "window_count": 88
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-17",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 183.2064,
+        "ofi": -5179.7335,
+        "realized_vol": 0.057037,
+        "total_volume": 41126.0494,
+        "window_count": 93
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-18",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 193.2883,
+        "ofi": -5717.9434,
+        "realized_vol": 0.075831,
+        "total_volume": 64050.3064,
+        "window_count": 88
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Stop-Hunt Sweep",
+      "attack_id": "av-005",
+      "case_id": "av-005-19",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-005",
+      "features": {
+        "mid_price": 194.027,
+        "ofi": -3614.4766,
+        "realized_vol": 0.067496,
+        "total_volume": 50270.1013,
+        "window_count": 109
+      },
+      "severity": 0.85
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-00",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 189.2283,
+        "ofi": 49.9129,
+        "realized_vol": 0.000977,
+        "total_volume": 5243.5154,
+        "window_count": 126
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-01",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 189.8779,
+        "ofi": 49.6565,
+        "realized_vol": 0.001024,
+        "total_volume": 5100.8617,
+        "window_count": 128
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-02",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 189.1393,
+        "ofi": 51.1043,
+        "realized_vol": 0.000962,
+        "total_volume": 4782.8823,
+        "window_count": 127
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-03",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 189.084,
+        "ofi": 51.3664,
+        "realized_vol": 0.000995,
+        "total_volume": 5098.532,
+        "window_count": 129
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-04",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 189.5225,
+        "ofi": 49.846,
+        "realized_vol": 0.001035,
+        "total_volume": 5054.5207,
+        "window_count": 126
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-05",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 190.3505,
+        "ofi": 47.7177,
+        "realized_vol": 0.001006,
+        "total_volume": 5060.8775,
+        "window_count": 127
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-06",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 190.6538,
+        "ofi": 52.4245,
+        "realized_vol": 0.001025,
+        "total_volume": 4840.5637,
+        "window_count": 128
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-07",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 189.2301,
+        "ofi": 49.8191,
+        "realized_vol": 0.001004,
+        "total_volume": 4952.0359,
+        "window_count": 129
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-08",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 189.2663,
+        "ofi": 52.1773,
+        "realized_vol": 0.001003,
+        "total_volume": 5094.3725,
+        "window_count": 128
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-09",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 190.7893,
+        "ofi": 51.7653,
+        "realized_vol": 0.001001,
+        "total_volume": 4809.0274,
+        "window_count": 129
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-10",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 186.8159,
+        "ofi": 45.8782,
+        "realized_vol": 0.000831,
+        "total_volume": 5205.4748,
+        "window_count": 132
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-11",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 191.276,
+        "ofi": 53.9047,
+        "realized_vol": 0.000891,
+        "total_volume": 4977.7808,
+        "window_count": 133
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-12",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 192.6863,
+        "ofi": 54.0582,
+        "realized_vol": 0.001172,
+        "total_volume": 5234.3843,
+        "window_count": 134
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-13",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 192.1038,
+        "ofi": 45.1599,
+        "realized_vol": 0.001002,
+        "total_volume": 4832.1937,
+        "window_count": 127
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-14",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 189.2732,
+        "ofi": 48.3651,
+        "realized_vol": 0.000896,
+        "total_volume": 5817.63,
+        "window_count": 134
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-15",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 189.5118,
+        "ofi": 49.8802,
+        "realized_vol": 0.001022,
+        "total_volume": 4825.3992,
+        "window_count": 126
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-16",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 197.4648,
+        "ofi": 53.2068,
+        "realized_vol": 0.000951,
+        "total_volume": 4440.6565,
+        "window_count": 116
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-17",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 186.5814,
+        "ofi": 42.0946,
+        "realized_vol": 0.000801,
+        "total_volume": 6178.9544,
+        "window_count": 118
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-18",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 196.0301,
+        "ofi": 34.5462,
+        "realized_vol": 0.000754,
+        "total_volume": 3418.2825,
+        "window_count": 137
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Quote Stuffing",
+      "attack_id": "av-006",
+      "case_id": "av-006-19",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-006",
+      "features": {
+        "mid_price": 188.9531,
+        "ofi": 47.5,
+        "realized_vol": 0.001049,
+        "total_volume": 3087.3076,
+        "window_count": 126
+      },
+      "severity": 0.6
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-00",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 191.6742,
+        "ofi": -3274.9114,
+        "realized_vol": 0.019146,
+        "total_volume": 29814.5398,
+        "window_count": 91
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-01",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 190.1275,
+        "ofi": -3117.2846,
+        "realized_vol": 0.020173,
+        "total_volume": 29493.4376,
+        "window_count": 88
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-02",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 191.0264,
+        "ofi": -3151.0713,
+        "realized_vol": 0.020159,
+        "total_volume": 29788.0117,
+        "window_count": 88
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-03",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 190.7301,
+        "ofi": -3188.9965,
+        "realized_vol": 0.019617,
+        "total_volume": 31334.3005,
+        "window_count": 91
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-04",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 191.6009,
+        "ofi": -3305.9123,
+        "realized_vol": 0.019186,
+        "total_volume": 31388.5845,
+        "window_count": 90
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-05",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 190.1209,
+        "ofi": -3074.9466,
+        "realized_vol": 0.019809,
+        "total_volume": 28888.2496,
+        "window_count": 90
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-06",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 190.3877,
+        "ofi": -3298.1504,
+        "realized_vol": 0.020313,
+        "total_volume": 30533.756,
+        "window_count": 91
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-07",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 190.9423,
+        "ofi": -3324.1316,
+        "realized_vol": 0.020514,
+        "total_volume": 29901.4444,
+        "window_count": 90
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-08",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 191.0681,
+        "ofi": -3269.0283,
+        "realized_vol": 0.020627,
+        "total_volume": 30623.7077,
+        "window_count": 90
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-09",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 191.2469,
+        "ofi": -3282.8387,
+        "realized_vol": 0.020211,
+        "total_volume": 30921.555,
+        "window_count": 90
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-10",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 191.7883,
+        "ofi": -3456.5199,
+        "realized_vol": 0.020973,
+        "total_volume": 26175.5226,
+        "window_count": 86
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-11",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 188.4773,
+        "ofi": -2883.5766,
+        "realized_vol": 0.021904,
+        "total_volume": 30310.112,
+        "window_count": 87
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-12",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 190.4429,
+        "ofi": -3186.854,
+        "realized_vol": 0.020103,
+        "total_volume": 25667.3802,
+        "window_count": 94
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-13",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 187.7071,
+        "ofi": -2685.0856,
+        "realized_vol": 0.02032,
+        "total_volume": 30969.9049,
+        "window_count": 87
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-14",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 193.7495,
+        "ofi": -3049.6965,
+        "realized_vol": 0.022458,
+        "total_volume": 32929.9025,
+        "window_count": 92
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-15",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 188.8578,
+        "ofi": -3021.3591,
+        "realized_vol": 0.021719,
+        "total_volume": 27216.1122,
+        "window_count": 87
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-16",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 194.4251,
+        "ofi": -4093.3764,
+        "realized_vol": 0.013287,
+        "total_volume": 24160.6061,
+        "window_count": 98
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-17",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 195.4028,
+        "ofi": -2450.8898,
+        "realized_vol": 0.019261,
+        "total_volume": 33805.4632,
+        "window_count": 84
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-18",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 187.7377,
+        "ofi": -2596.2328,
+        "realized_vol": 0.019515,
+        "total_volume": 26002.0772,
+        "window_count": 97
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Bid",
+      "attack_id": "av-007",
+      "case_id": "av-007-19",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-007",
+      "features": {
+        "mid_price": 191.2336,
+        "ofi": -2924.1506,
+        "realized_vol": 0.017505,
+        "total_volume": 19725.9737,
+        "window_count": 97
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-00",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 190.7093,
+        "ofi": 3278.7538,
+        "realized_vol": 0.020772,
+        "total_volume": 28959.1125,
+        "window_count": 90
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-01",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 191.0306,
+        "ofi": 3278.4122,
+        "realized_vol": 0.019367,
+        "total_volume": 31301.2985,
+        "window_count": 89
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-02",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 191.5511,
+        "ofi": 3185.827,
+        "realized_vol": 0.019763,
+        "total_volume": 30782.3538,
+        "window_count": 91
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-03",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 190.1678,
+        "ofi": 3105.4876,
+        "realized_vol": 0.019462,
+        "total_volume": 30749.6007,
+        "window_count": 89
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-04",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 191.4608,
+        "ofi": 3175.9978,
+        "realized_vol": 0.019139,
+        "total_volume": 31112.1604,
+        "window_count": 89
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-05",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 190.2641,
+        "ofi": 3350.4562,
+        "realized_vol": 0.0195,
+        "total_volume": 30985.2042,
+        "window_count": 89
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-06",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 190.1767,
+        "ofi": 3113.9943,
+        "realized_vol": 0.019151,
+        "total_volume": 29492.5216,
+        "window_count": 89
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-07",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 190.7205,
+        "ofi": 3212.9564,
+        "realized_vol": 0.019424,
+        "total_volume": 29622.4465,
+        "window_count": 89
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-08",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 191.0551,
+        "ofi": 3108.0956,
+        "realized_vol": 0.020423,
+        "total_volume": 29018.5027,
+        "window_count": 88
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-09",
+      "difficulty": "easy",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 190.8925,
+        "ofi": 3183.6464,
+        "realized_vol": 0.019873,
+        "total_volume": 31048.5215,
+        "window_count": 90
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-10",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 191.0068,
+        "ofi": 2992.5821,
+        "realized_vol": 0.021876,
+        "total_volume": 28399.0068,
+        "window_count": 93
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-11",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 191.6212,
+        "ofi": 3607.0428,
+        "realized_vol": 0.023184,
+        "total_volume": 30829.178,
+        "window_count": 86
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-12",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 190.9669,
+        "ofi": 3179.5709,
+        "realized_vol": 0.017608,
+        "total_volume": 31680.2215,
+        "window_count": 91
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-13",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 188.8164,
+        "ofi": 2924.3629,
+        "realized_vol": 0.021685,
+        "total_volume": 32689.233,
+        "window_count": 87
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-14",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 191.2075,
+        "ofi": 3167.8905,
+        "realized_vol": 0.01802,
+        "total_volume": 25683.1542,
+        "window_count": 91
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-15",
+      "difficulty": "borderline",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 188.7685,
+        "ofi": 2720.7908,
+        "realized_vol": 0.022618,
+        "total_volume": 28706.4298,
+        "window_count": 85
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-16",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 195.9807,
+        "ofi": 2838.7393,
+        "realized_vol": 0.02302,
+        "total_volume": 37211.4485,
+        "window_count": 91
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-17",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 191.8565,
+        "ofi": 2049.6574,
+        "realized_vol": 0.026441,
+        "total_volume": 34719.0954,
+        "window_count": 82
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-18",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 195.5945,
+        "ofi": 4346.7139,
+        "realized_vol": 0.01993,
+        "total_volume": 39170.5051,
+        "window_count": 81
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Spoofing \u2014 Ask",
+      "attack_id": "av-008",
+      "case_id": "av-008-19",
+      "difficulty": "hard",
+      "expected_action": "MONITOR",
+      "expected_reason_code": "MATCH_AV-008",
+      "features": {
+        "mid_price": 184.0872,
+        "ofi": 2929.2716,
+        "realized_vol": 0.017575,
+        "total_volume": 35853.427,
+        "window_count": 95
+      },
+      "severity": 0.8
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-00",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 191.7392,
+        "ofi": 1015.3742,
+        "realized_vol": 0.012425,
+        "total_volume": 12055.1305,
+        "window_count": 78
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-01",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 192.4335,
+        "ofi": 1048.3101,
+        "realized_vol": 0.011566,
+        "total_volume": 11669.6868,
+        "window_count": 79
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-02",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 192.9194,
+        "ofi": 961.2903,
+        "realized_vol": 0.011547,
+        "total_volume": 11606.6926,
+        "window_count": 79
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-03",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 192.1307,
+        "ofi": 1009.2836,
+        "realized_vol": 0.0118,
+        "total_volume": 12104.9429,
+        "window_count": 79
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-04",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 191.8669,
+        "ofi": 962.9603,
+        "realized_vol": 0.01203,
+        "total_volume": 12589.216,
+        "window_count": 81
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-05",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 192.3372,
+        "ofi": 1007.1619,
+        "realized_vol": 0.01231,
+        "total_volume": 11914.8194,
+        "window_count": 80
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-06",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 193.0394,
+        "ofi": 1020.9108,
+        "realized_vol": 0.012214,
+        "total_volume": 11894.3258,
+        "window_count": 80
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-07",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 192.1157,
+        "ofi": 1012.6463,
+        "realized_vol": 0.012378,
+        "total_volume": 12029.7741,
+        "window_count": 78
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-08",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 193.1318,
+        "ofi": 972.1778,
+        "realized_vol": 0.012372,
+        "total_volume": 11931.4209,
+        "window_count": 79
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-09",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 193.3407,
+        "ofi": 1028.1481,
+        "realized_vol": 0.012278,
+        "total_volume": 11906.2814,
+        "window_count": 79
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-10",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 192.5205,
+        "ofi": 946.4696,
+        "realized_vol": 0.011613,
+        "total_volume": 10038.9358,
+        "window_count": 78
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-11",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 191.0986,
+        "ofi": 859.2737,
+        "realized_vol": 0.014104,
+        "total_volume": 13828.3954,
+        "window_count": 83
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-12",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 192.6374,
+        "ofi": 1103.5247,
+        "realized_vol": 0.012641,
+        "total_volume": 10814.4055,
+        "window_count": 83
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-13",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 189.9331,
+        "ofi": 887.3302,
+        "realized_vol": 0.012988,
+        "total_volume": 13215.4043,
+        "window_count": 82
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-14",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 195.0401,
+        "ofi": 837.132,
+        "realized_vol": 0.012893,
+        "total_volume": 13777.9245,
+        "window_count": 75
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-15",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 190.03,
+        "ofi": 920.282,
+        "realized_vol": 0.013778,
+        "total_volume": 13838.2562,
+        "window_count": 77
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-16",
+      "difficulty": "hard",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 193.6584,
+        "ofi": 1152.926,
+        "realized_vol": 0.015347,
+        "total_volume": 9546.4542,
+        "window_count": 75
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-17",
+      "difficulty": "hard",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 200.0421,
+        "ofi": 886.7519,
+        "realized_vol": 0.009089,
+        "total_volume": 14225.7369,
+        "window_count": 74
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-18",
+      "difficulty": "hard",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 194.3785,
+        "ofi": 1094.6518,
+        "realized_vol": 0.007924,
+        "total_volume": 11764.6306,
+        "window_count": 71
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Cross-Venue Arbitrage Surge",
+      "attack_id": "av-009",
+      "case_id": "av-009-19",
+      "difficulty": "hard",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-009",
+      "features": {
+        "mid_price": 199.1642,
+        "ofi": 634.9958,
+        "realized_vol": 0.016682,
+        "total_volume": 12495.783,
+        "window_count": 73
+      },
+      "severity": 0.4
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-00",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 188.4556,
+        "ofi": 390.6396,
+        "realized_vol": 0.017153,
+        "total_volume": 20422.0984,
+        "window_count": 91
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-01",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 188.8388,
+        "ofi": 392.1391,
+        "realized_vol": 0.018442,
+        "total_volume": 20469.0554,
+        "window_count": 90
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-02",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 187.223,
+        "ofi": 407.8871,
+        "realized_vol": 0.018438,
+        "total_volume": 20244.8673,
+        "window_count": 89
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-03",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 187.9065,
+        "ofi": 414.9362,
+        "realized_vol": 0.018654,
+        "total_volume": 20673.4748,
+        "window_count": 91
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-04",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 187.7755,
+        "ofi": 394.5766,
+        "realized_vol": 0.017627,
+        "total_volume": 19401.3313,
+        "window_count": 88
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-05",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 188.0654,
+        "ofi": 405.7978,
+        "realized_vol": 0.018054,
+        "total_volume": 19426.2046,
+        "window_count": 90
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-06",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 188.4652,
+        "ofi": 390.5636,
+        "realized_vol": 0.017536,
+        "total_volume": 20928.8114,
+        "window_count": 89
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-07",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 187.9376,
+        "ofi": 412.2993,
+        "realized_vol": 0.017323,
+        "total_volume": 20770.9779,
+        "window_count": 89
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-08",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 188.5402,
+        "ofi": 406.5116,
+        "realized_vol": 0.01866,
+        "total_volume": 20715.3274,
+        "window_count": 90
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-09",
+      "difficulty": "easy",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 187.1219,
+        "ofi": 380.9084,
+        "realized_vol": 0.01752,
+        "total_volume": 19282.5043,
+        "window_count": 90
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-10",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 189.7434,
+        "ofi": 387.7352,
+        "realized_vol": 0.019108,
+        "total_volume": 21464.4975,
+        "window_count": 87
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-11",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 187.3913,
+        "ofi": 425.8329,
+        "realized_vol": 0.016339,
+        "total_volume": 20065.1156,
+        "window_count": 92
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-12",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 185.4812,
+        "ofi": 471.0306,
+        "realized_vol": 0.02069,
+        "total_volume": 21171.3124,
+        "window_count": 90
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-13",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 185.8655,
+        "ofi": 439.9533,
+        "realized_vol": 0.019596,
+        "total_volume": 22710.3743,
+        "window_count": 91
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-14",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 187.5074,
+        "ofi": 465.7381,
+        "realized_vol": 0.018704,
+        "total_volume": 17157.9535,
+        "window_count": 92
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-15",
+      "difficulty": "borderline",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 185.3118,
+        "ofi": 343.5474,
+        "realized_vol": 0.01722,
+        "total_volume": 20805.2146,
+        "window_count": 86
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-16",
+      "difficulty": "hard",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 180.7477,
+        "ofi": 362.9732,
+        "realized_vol": 0.023668,
+        "total_volume": 24816.0163,
+        "window_count": 79
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-17",
+      "difficulty": "hard",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 192.1277,
+        "ofi": 325.9153,
+        "realized_vol": 0.014269,
+        "total_volume": 19034.71,
+        "window_count": 79
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-18",
+      "difficulty": "hard",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 187.4019,
+        "ofi": 439.9231,
+        "realized_vol": 0.013702,
+        "total_volume": 24569.2225,
+        "window_count": 81
+      },
+      "severity": 0.3
+    },
+    {
+      "attack_class": "Earnings-Reaction Burst",
+      "attack_id": "av-010",
+      "case_id": "av-010-19",
+      "difficulty": "hard",
+      "expected_action": "NO_ACTION",
+      "expected_reason_code": "MATCH_AV-010",
+      "features": {
+        "mid_price": 191.6043,
+        "ofi": 353.2272,
+        "realized_vol": 0.020048,
+        "total_volume": 13516.3995,
+        "window_count": 79
+      },
+      "severity": 0.3
+    }
+  ],
+  "count": 200,
+  "revision": "0c663bb5d829174a678affeeb40fa0ecf44e369add2bebe1a32ac822a8c22f8e",
+  "schema": "chainguard.eval.fixture.v1"
+}
