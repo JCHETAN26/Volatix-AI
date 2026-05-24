@@ -345,36 +345,61 @@ Implementation follows the strict sequence defined in `build-plan.md`. Each phas
 A nightly evaluation harness around the LangGraph agent cluster — the difference
 between *shipping an LLM demo* and *running LLMs in production*.
 
+![Eval dashboard with regression banner](docs/eval-regression.png)
+
 - **Curated fixture** (`services/agents/eval/fixtures/cases.json`) — 200
-  hand-labeled cases generated from the 10-class attack-vector taxonomy in
-  the Qdrant seed, with controlled jitter around each centroid. Each case
-  has `expected_action ∈ {FREEZE, MONITOR, NO_ACTION}`, an
-  `expected_reason_code`, and a `difficulty` tag (easy / borderline / hard).
-- **Replay runner** (`services/agents/eval/runner.py`) — invokes the agent
-  graph directly (bypasses Kafka) against every case, captures the full
-  agent output + Qdrant RAG context.
-- **Ragas + binary metrics**:
-  - `faithfulness` — does the auditor's rationale cite the RAG-retrieved
-    attack vectors, or invent its own?
+  cases generated deterministically from the 10-class attack-vector
+  taxonomy in the Qdrant seed (20 per class), with seeded RNG jitter.
+  Each case carries `expected_action ∈ {FREEZE, MONITOR, NO_ACTION}`,
+  `expected_reason_code`, and a `difficulty` tag (easy / borderline /
+  hard). Re-running the generator is byte-identical; the fixture
+  revision is a sha256 stored inside the file so every `eval_run`
+  locks to a specific fixture state.
+- **Replay runner** (`services/agents/eval/runner.py`) — invokes the
+  agent graph directly (bypasses Kafka) against every case, captures
+  the full agent output + Qdrant RAG context, measures per-stage
+  wall-clock latency. Per-case `try/except` so a single graph crash
+  doesn't lose the whole run.
+- **Three metrics, two from Ragas, one from the fixture label**:
+  - `faithfulness` — does the auditor's rationale cite the
+    RAG-retrieved attack vectors, or invent its own? Judge LLM scores
+    every claim against the retrieved context.
   - `answer_relevancy` — does the rationale address the actual feature
-    vector, or wander?
-  - `freeze_correctness` — binary match of the Enforcer's action vs. the
-    fixture label.
-  - p50 / p95 stage latency.
+    vector, or wander? Cosine similarity against a Gemini-embedded
+    paraphrase of the original question.
+  - `freeze_correctness` — binary match of the Enforcer's action vs.
+    the fixture label. No LLM needed; always computed even when Ragas
+    is offline.
+  - p50 / p95 stage latency rolled up on the same row.
 - **Prompt version tagging** — every `agent_report` row carries a
   `prompt_version` column; the eval runner records `(prompt_version,
   fixture_revision)` so regression is per-version, not per-day.
-- **Nightly Airflow DAG** (`chainguard_eval`) — same Airflow infra as the
-  LightGBM retraining DAG; one KubernetesPodOperator runs the eval runner
-  against the latest prompt version and writes results to `eval_run` +
-  `eval_case_result`.
-- **`/eval` dashboard** — Next.js page with metric-per-version line charts,
-  red flags on regression, per-case drilldown showing prompt + RAG context
-  + agent output + label + Ragas scores.
+- **Nightly Airflow DAG** (`airflow/dags/chainguard_eval.py`) — same
+  KubernetesPodOperator pattern as the LightGBM retraining DAG. Spawns
+  an ephemeral 3GB pod from the agents image, runs the eval, writes
+  one `eval_run` row + 200 `eval_case_result` rows to Supabase.
+- **`/eval` dashboard** — Next.js page with metric-per-version
+  sparkline charts (zero chart dependencies, inline SVG), a per-case
+  drilldown table, and a regression banner that fires when any metric
+  drops > 5% vs. the prior run for the same prompt version.
 
 The point: catch the failure mode where **FREEZE accuracy holds at 94% but
-faithfulness drops 0.21** — the agent picks the right action via gut, not
-via evidence — *before* the prompt change reaches production.
+faithfulness drops 0.19** (`v1` in the screenshot above) — the agent
+picks the right action via gut, not via evidence — *before* the prompt
+change reaches production.
+
+To trigger a run by hand (instead of waiting for the DAG):
+
+```bash
+kubectl run chainguard-eval-once \
+    --image=chainguard-agents:dev --restart=Never \
+    --env=DATABASE_URL="$DATABASE_URL" \
+    --env=GOOGLE_API_KEY="$GOOGLE_API_KEY" \
+    --env=QDRANT_URL=http://vector-db.default.svc.cluster.local:6333 \
+    --env=LLM_PROVIDER=gemini --env=LLM_MODEL=gemini-2.5-flash \
+    --env=PROMPT_VERSION=v1 \
+    -- python3 -m agents.eval.runner --notes "manual run"
+```
 
 ---
 
