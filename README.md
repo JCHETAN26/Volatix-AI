@@ -345,7 +345,19 @@ Implementation follows the strict sequence defined in `build-plan.md`. Each phas
 A nightly evaluation harness around the LangGraph agent cluster — the difference
 between *shipping an LLM demo* and *running LLMs in production*.
 
-![Eval dashboard with regression banner](docs/eval-regression.png)
+![Eval dashboard, real run](docs/eval-dashboard.png)
+
+*Above: the dashboard after one real eval run (`v1`, 20 cases, Gemini 2.5 Flash):
+`freeze_correctness=1.000`, `faithfulness=0.161`, `answer_relevancy=0.750`.
+That low faithfulness number is real signal — the auditor produces correct
+FREEZE decisions but doesn't reliably cite the Qdrant RAG-retrieved attack
+vectors in its rationale. Exactly the kind of failure mode binary accuracy
+alone would miss.*
+
+When a metric drops > 5% vs. the prior run for the same `prompt_version`,
+the regression banner fires:
+
+![Regression banner](docs/eval-regression.png)
 
 - **Curated fixture** (`services/agents/eval/fixtures/cases.json`) — 200
   cases generated deterministically from the 10-class attack-vector
