@@ -1,8 +1,11 @@
 // Human-friendly formatters used by the dashboard. Kept here so server +
 // client components can both use them without re-implementing.
 
-export function fmtNumber(n: number, digits = 2): string {
-  if (!Number.isFinite(n)) return "—";
+export function fmtNumber(
+  n: number | null | undefined,
+  digits = 2,
+): string {
+  if (n === null || n === undefined || !Number.isFinite(n)) return "—";
   return n.toLocaleString(undefined, {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
