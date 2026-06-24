@@ -1,4 +1,4 @@
-# ChainGuard-Core — Python classifier service (Phase 4.1).
+# Volatix-AI — Python classifier service (Phase 4.1).
 #
 # Two-stage so we can train the baseline model inside the build pipeline
 # (stage 1) and keep the runtime layer slim (stage 2). The same image is
@@ -33,7 +33,7 @@ RUN PYTHONPATH=/install/lib/python3.12/site-packages:/build \
 # ---------------------------------------------------------------------------
 FROM python:3.12-slim-bookworm AS runtime
 
-LABEL org.opencontainers.image.title="chainguard-classifier" \
+LABEL org.opencontainers.image.title="volatix-classifier" \
       org.opencontainers.image.description="LightGBM anomaly classifier + Airflow trainer" \
       org.opencontainers.image.source="https://github.com/JCHETAN26/Volatix-AI" \
       org.opencontainers.image.licenses="Proprietary"
@@ -46,17 +46,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libgomp1 ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system --gid 1000 chainguard \
-    && useradd  --system --gid 1000 --uid 1000 --shell /usr/sbin/nologin chainguard \
+    && groupadd --system --gid 1000 volatix \
+    && useradd  --system --gid 1000 --uid 1000 --shell /usr/sbin/nologin volatix \
     && mkdir -p /models /app \
-    && chown -R chainguard:chainguard /models /app
+    && chown -R volatix:volatix /models /app
 
 COPY --from=builder /install /usr/local
 COPY --from=builder /build/classifier /app/classifier
 COPY --from=builder /build/classifier/models/baseline.txt /models/baseline.txt
 
 WORKDIR /app
-USER chainguard
+USER volatix
 
 # Default entrypoint runs the streaming consumer. Airflow's
 # KubernetesPodOperator overrides args=[...] to invoke the trainer:

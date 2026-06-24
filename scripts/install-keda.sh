@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ChainGuard-Core — install KEDA into the local cluster (Phase 3.2).
+# Volatix-AI — install KEDA into the local cluster (Phase 3.2).
 #
 # Idempotent. Registers the kedacore Helm repo, installs KEDA into the
 # `keda` namespace, waits for the operator + metrics server to be Ready.

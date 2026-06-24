@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ChainGuard-Core — direct Kafka feature injector (Phase 5.2 timing test).
+"""Volatix-AI — direct Kafka feature injector (Phase 5.2 timing test).
 
 Bypasses the WebSocket + C++ engine path and publishes a small burst of
 hand-crafted `FeatureFrame` records directly to the `financial-features`
@@ -84,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
 
     producer = KafkaProducer(
         bootstrap_servers=args.brokers,
-        client_id="chainguard-inject-features",
+        client_id="volatix-inject-features",
         linger_ms=0,        # ship immediately for the timing test
         acks="all",
     )

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ChainGuard-Core — Vector DB validation (Phase 1 / Task 1.2 acceptance).
+"""Volatix-AI — Vector DB validation (Phase 1 / Task 1.2 acceptance).
 
 Pure-stdlib script. Hits a Qdrant instance and proves:
   1. /healthz responds 200 OK.
@@ -95,7 +95,7 @@ def main() -> int:
     args = parser.parse_args()
 
     base = args.base_url.rstrip("/")
-    collection = f"chainguard-validation-{uuid.uuid4().hex[:8]}"
+    collection = f"volatix-validation-{uuid.uuid4().hex[:8]}"
 
     print(f"Validating vector DB at {base}")
     try:

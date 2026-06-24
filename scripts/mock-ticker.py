@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ChainGuard-Core — mock WebSocket ticker (Phase 2.2 dev fixture).
+"""Volatix-AI — mock WebSocket ticker (Phase 2.2 dev fixture).
 
 Emits Polygon-flavored JSON tick records on every connected client at a
 configurable rate. Used to exercise the C++ --ingest path locally without

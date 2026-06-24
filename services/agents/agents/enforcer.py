@@ -63,7 +63,7 @@ def _default_action(state: CaseState) -> EnforcementAction:
 
 def _compose_final_md(state: CaseState, enforced: bool) -> str:
     lines: list[str] = [
-        f"# ChainGuard Audit Report — case {state.case_id}",
+        f"# Volatix Audit Report — case {state.case_id}",
         "",
         f"- **symbol**: `{state.symbol}`",
         f"- **ts_ns**: {state.ts_ns}",

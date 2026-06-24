@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(chainguard
+project(volatix
     VERSION 0.1.0
-    DESCRIPTION "ChainGuard-Core low-latency streaming feature engine"
+    DESCRIPTION "Volatix-AI low-latency streaming feature engine"
     LANGUAGES CXX
 )
 

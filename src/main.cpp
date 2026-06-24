@@ -1,4 +1,4 @@
-// ChainGuard-Core — Ingestion & Feature Engineering Engine
+// Volatix-AI — Ingestion & Feature Engineering Engine
 //
 // Phase 2.1: native Kafka producer with --probe / --smoke modes.
 // Phase 2.2: --ingest streams JSON ticks off a WebSocket and parses them
@@ -30,14 +30,14 @@
 #include "tick_parser.hpp"
 #include "ws_client.hpp"
 
-namespace chainguard {
+namespace volatix {
 
 constexpr const char* kVersion = "0.3.1";
 constexpr const char* kDefaultBrokers = "localhost:9092";
 constexpr const char* kDefaultWsUrl = "ws://localhost:8765/";
-constexpr const char* kSmokeTopic = "chainguard.smoke";
+constexpr const char* kSmokeTopic = "volatix.smoke";
 constexpr const char* kDefaultConsumeTopic = "raw-ticks";
-constexpr const char* kDefaultConsumeGroup = "chainguard-engine";
+constexpr const char* kDefaultConsumeGroup = "volatix-engine";
 constexpr int kSmokeMessageCount = 10;
 constexpr int kFlushTimeoutMs = 10'000;
 constexpr int kMetadataTimeoutMs = 5'000;
@@ -96,7 +96,7 @@ std::unique_ptr<RdKafka::Producer> make_producer(const std::string& brokers,
     std::unique_ptr<RdKafka::Conf> conf(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
     if (!conf_set(*conf, "bootstrap.servers", brokers))
         return nullptr;
-    if (!conf_set(*conf, "client.id", "chainguard-core"))
+    if (!conf_set(*conf, "client.id", "volatix-core"))
         return nullptr;
     // 5s socket timeout keeps --probe responsive when nothing is listening.
     if (!conf_set(*conf, "socket.timeout.ms", "5000"))
@@ -113,7 +113,7 @@ std::unique_ptr<RdKafka::Producer> make_producer(const std::string& brokers,
 }
 
 int run_probe(const std::string& brokers) {
-    std::cout << "chainguard " << kVersion << " — probe\n"
+    std::cout << "volatix " << kVersion << " — probe\n"
               << "  brokers: " << brokers << '\n';
 
     auto producer = make_producer(brokers, nullptr);
@@ -137,7 +137,7 @@ int run_probe(const std::string& brokers) {
 }
 
 int run_smoke(const std::string& brokers) {
-    std::cout << "chainguard " << kVersion << " — Kafka smoke test\n"
+    std::cout << "volatix " << kVersion << " — Kafka smoke test\n"
               << "  brokers: " << brokers << '\n'
               << "  topic:   " << kSmokeTopic << '\n'
               << "  count:   " << kSmokeMessageCount << '\n';
@@ -148,7 +148,7 @@ int run_smoke(const std::string& brokers) {
         return EXIT_FAILURE;
 
     for (int i = 0; i < kSmokeMessageCount; ++i) {
-        std::string payload = "chainguard-smoke-" + std::to_string(i);
+        std::string payload = "volatix-smoke-" + std::to_string(i);
         const RdKafka::ErrorCode produce_err = producer->produce(kSmokeTopic,
                                                                  RdKafka::Topic::PARTITION_UA,
                                                                  RdKafka::Producer::RK_MSG_COPY,
@@ -199,7 +199,7 @@ int run_ingest(const std::string& ws_url) {
         return EXIT_FAILURE;
     }
 
-    std::cout << "chainguard " << kVersion << " — ingest\n"
+    std::cout << "volatix " << kVersion << " — ingest\n"
               << "  url:    " << ws_url << '\n'
               << "  host:   " << target.host << ":" << target.port << target.path << '\n'
               << "  tls:    " << (target.tls ? "yes" : "no") << '\n';
@@ -260,7 +260,7 @@ int run_ingest(const std::string& ws_url) {
 }
 
 int run_throughput_test(int count) {
-    std::cout << "chainguard " << kVersion << " — throughput test\n"
+    std::cout << "volatix " << kVersion << " — throughput test\n"
               << "  payloads: " << count << '\n';
 
     // Synthesize one payload per loop iteration so we exercise the parser
@@ -343,10 +343,10 @@ void print_usage(const char* argv0) {
               << "  -h, --help                          Print this help and exit\n";
 }
 
-}  // namespace chainguard
+}  // namespace volatix
 
 int main(int argc, char** argv) {
-    using namespace chainguard;
+    using namespace volatix;
 
     std::string brokers = kDefaultBrokers;
     std::string ws_url = kDefaultWsUrl;
@@ -413,7 +413,7 @@ int main(int argc, char** argv) {
                 }
             }
         } else if (arg == "--version") {
-            std::cout << "chainguard " << kVersion << '\n';
+            std::cout << "volatix " << kVersion << '\n';
             return EXIT_SUCCESS;
         } else if (arg == "-h" || arg == "--help") {
             print_usage(argv[0]);
@@ -451,7 +451,7 @@ int main(int argc, char** argv) {
             return run_consume(brokers, consume_topic, consume_group);
         case Mode::Default:
             // No args: build smoke-test (used by CI). Must not contact Kafka.
-            std::cout << "chainguard " << kVersion << " — Phase 3 build OK\n"
+            std::cout << "volatix " << kVersion << " — Phase 3 build OK\n"
                       << "  Modes: --probe | --smoke | --ingest | --throughput-test\n"
                       << "         --engine | --feature-bench | --consume\n"
                       << "  Default brokers: " << brokers << '\n'

@@ -1,22 +1,22 @@
-# ChainGuard-Core — classifier service Deployment (Phase 4.1).
+# Volatix-AI — classifier service Deployment (Phase 4.1).
 #
 # Streams financial-features → LightGBM → anomaly-scores. Mirrors every
 # scored frame into PostgreSQL (feature_log + anomaly_score_log) so the
 # Airflow retraining DAG can train on real traffic.
 #
-# Model artifact lives on a PVC ("chainguard-models") that the Airflow
+# Model artifact lives on a PVC ("volatix-models") that the Airflow
 # trainer pod writes into. The classifier hot-reloads on pod restart.
 #
-# DATABASE_URL is supplied by the `chainguard-db` Secret. Apply it with:
+# DATABASE_URL is supplied by the `volatix-db` Secret. Apply it with:
 #   make set-db-url           # reads $DATABASE_URL from the shell
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: chainguard-models
+  name: volatix-models
   labels:
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   accessModes:
     - ReadWriteOnce
@@ -28,15 +28,15 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: chainguard-classifier-config
+  name: volatix-classifier-config
   labels:
-    app.kubernetes.io/name: chainguard-classifier
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/name: volatix-classifier
+    app.kubernetes.io/part-of: volatix-core
 data:
   KAFKA_BROKERS: "chain-kafka.default.svc.cluster.local:9092"
   INPUT_TOPIC: "financial-features"
   OUTPUT_TOPIC: "anomaly-scores"
-  CONSUMER_GROUP: "chainguard-classifier"
+  CONSUMER_GROUP: "volatix-classifier"
   SCORE_THRESHOLD: "0.85"
   MODEL_PATH: "/models/baseline.txt"
   WRITE_POSTGRES: "true"
@@ -45,22 +45,22 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chainguard-classifier
+  name: volatix-classifier
   labels:
-    app.kubernetes.io/name: chainguard-classifier
+    app.kubernetes.io/name: volatix-classifier
     app.kubernetes.io/component: ml-inference
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: chainguard-classifier
+      app.kubernetes.io/name: volatix-classifier
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: chainguard-classifier
+        app.kubernetes.io/name: volatix-classifier
         app.kubernetes.io/component: ml-inference
-        app.kubernetes.io/part-of: chainguard-core
+        app.kubernetes.io/part-of: volatix-core
     spec:
       securityContext:
         runAsNonRoot: true
@@ -72,7 +72,7 @@ spec:
         # so the classifier has a model on cold start. Airflow retraining
         # later overwrites /models/baseline.txt in-place.
         - name: seed-baseline-model
-          image: chainguard-classifier:dev
+          image: volatix-classifier:dev
           imagePullPolicy: IfNotPresent
           command:
             - sh
@@ -89,16 +89,16 @@ spec:
               mountPath: /models
       containers:
         - name: classifier
-          image: chainguard-classifier:dev
+          image: volatix-classifier:dev
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
-                name: chainguard-classifier-config
+                name: volatix-classifier-config
           env:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: chainguard-db
+                  name: volatix-db
                   key: DATABASE_URL
           volumeMounts:
             - name: models
@@ -113,4 +113,4 @@ spec:
       volumes:
         - name: models
           persistentVolumeClaim:
-            claimName: chainguard-models
+            claimName: volatix-models

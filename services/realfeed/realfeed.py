@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ChainGuard-Core — Coinbase Exchange WS → ChainGuard schema adapter.
+"""Volatix-AI — Coinbase Exchange WS → Volatix schema adapter.
 
 Connects to wss://ws-feed.exchange.coinbase.com (public, no API key
 required), subscribes to the `matches` channel for one or more product
@@ -8,7 +8,7 @@ WebSocket server on port 8765 — the same interface the engine's
 WsClient already speaks via mock-ticker.py.
 
 Translation:
-    Coinbase match    → ChainGuard tick
+    Coinbase match    → Volatix tick
     ──────────────────────────────────────────────────────────────
     product_id "BTC-USD"  → sym "BTC"   (8-char field, truncated)
     price (string)        → p (float)
@@ -57,7 +57,7 @@ _clients: set[websockets.WebSocketServerProtocol] = set()
 
 
 def _adapt(match: dict) -> str | None:
-    """Coinbase match → ChainGuard tick JSON. Returns None on malformed input."""
+    """Coinbase match → Volatix tick JSON. Returns None on malformed input."""
     try:
         product = str(match["product_id"])
         sym = product.split("-", 1)[0][:8]  # "BTC-USD" → "BTC"; fits the 8-byte symbol field

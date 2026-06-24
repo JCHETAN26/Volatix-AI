@@ -1,8 +1,8 @@
 {
-  "name": "chainguard-web",
+  "name": "volatix-web",
   "version": "0.1.0",
   "private": true,
-  "description": "ChainGuard-Core analytical control board (Phase 5).",
+  "description": "Volatix-AI analytical control board (Phase 5).",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

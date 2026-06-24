@@ -1,4 +1,4 @@
-# ChainGuard-Core — Changelog
+# Volatix-AI — Changelog
 
 ## v1.1.0 — Phase 6 complete
 
@@ -19,7 +19,7 @@
   output + Qdrant RAG context, scores each case with Ragas (faithfulness
   + answer_relevancy) and a binary `freeze_correctness` against the
   fixture label.
-- **Nightly Airflow DAG** `chainguard_eval` (`airflow/dags/chainguard_eval.py`)
+- **Nightly Airflow DAG** `volatix_eval` (`airflow/dags/volatix_eval.py`)
   — KubernetesPodOperator spawns a 3GB pod from the agents image, runs
   the eval, writes one `eval_run` row + 200 `eval_case_result` rows.
   Schedule: 03:00 UTC daily, 1h after the LightGBM retraining DAG.
@@ -44,7 +44,7 @@
   classifier + trainer, the LangGraph agents, the Airflow retraining
   DAG, and the Next.js dashboard — connect via a single `DATABASE_URL`
   env var (libpq URL form, accepted natively by psycopg2 and node-pg).
-  The in-cluster `chainguard-db` Secret holds the URL; `make set-db-url`
+  The in-cluster `volatix-db` Secret holds the URL; `make set-db-url`
   syncs `$DATABASE_URL` from your shell into it. Schema bootstrap
   (`scripts/init-postgres.sh`) now runs local `psql` against the
   Supabase host. `scripts/end-to-end.sh` likewise uses local `psql`
@@ -82,7 +82,7 @@ End-to-end financial threat-detection pipeline:
   `gcr.io/distroless/cc-debian12:nonroot` runtime. `ldd`-resolved deps;
   hard size gate (< 150MB) in `docker-ci`.
 - **Phase 3.2 — KEDA autoscaling.** ScaledObject scales the
-  `chainguard-engine` Deployment from 1 → 5 replicas on `raw-ticks`
+  `volatix-engine` Deployment from 1 → 5 replicas on `raw-ticks`
   consumer lag; cooldown back to 1 after drain.
 - **Phase 4.1 — LightGBM classifier + Airflow.** Python `kafka-python`
   consumer → LightGBM → `anomaly-scores`. Postgres mirror tables
@@ -125,6 +125,6 @@ acceptance run is green:
 
 ```bash
 git checkout main && git pull
-git tag -a v1.0.0 -m "ChainGuard-Core v1.0.0 — end-to-end pipeline"
+git tag -a v1.0.0 -m "Volatix-AI v1.0.0 — end-to-end pipeline"
 git push origin v1.0.0
 ```

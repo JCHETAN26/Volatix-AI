@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ChainGuard-Core — full-stack demo teardown (Phase 5.2).
+# Volatix-AI — full-stack demo teardown (Phase 5.2).
 #
 # Cleans everything `demo-up.sh` brought online without nuking the
 # Minikube node itself. Pass --nuke to also `minikube delete`.

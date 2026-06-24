@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ChainGuard-Core — apply scripts/sql/init.sql to Supabase (or any Postgres
+# Volatix-AI — apply scripts/sql/init.sql to Supabase (or any Postgres
 # reachable via DATABASE_URL). Idempotent; safe to rerun.
 
 set -euo pipefail

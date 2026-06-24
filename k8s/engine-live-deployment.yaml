@@ -1,11 +1,11 @@
-# ChainGuard-Core — live engine Deployment (post-1.0 demo).
+# Volatix-AI — live engine Deployment (post-1.0 demo).
 #
-# Runs `chainguard --engine` against an in-cluster WebSocket producer
+# Runs `volatix --engine` against an in-cluster WebSocket producer
 # (mock-ticker by default, realfeed for live Coinbase data). Emits
 # FeatureFrame records onto the `financial-features` Kafka topic the
 # classifier already consumes.
 #
-# This is the COMPANION to k8s/deployment.yaml's chainguard-engine
+# This is the COMPANION to k8s/deployment.yaml's volatix-engine
 # (which stays as the KEDA-scaled `--consume` fixture). The live engine
 # is the one that actually drives end-to-end data flow in the dashboard.
 #
@@ -17,30 +17,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chainguard-engine-live
+  name: volatix-engine-live
   labels:
-    app.kubernetes.io/name: chainguard-engine-live
+    app.kubernetes.io/name: volatix-engine-live
     app.kubernetes.io/component: ingest-engine
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: chainguard-engine-live
+      app.kubernetes.io/name: volatix-engine-live
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: chainguard-engine-live
+        app.kubernetes.io/name: volatix-engine-live
         app.kubernetes.io/component: ingest-engine
-        app.kubernetes.io/part-of: chainguard-core
+        app.kubernetes.io/part-of: volatix-core
     spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65532
         fsGroup: 65532
       containers:
-        - name: chainguard
-          image: chainguard-core:dev
+        - name: volatix
+          image: volatix-core:dev
           imagePullPolicy: IfNotPresent
           args:
             - "--engine"
@@ -65,7 +65,7 @@ spec:
               memory: "1Gi"
           startupProbe:
             exec:
-              command: ["/usr/local/bin/chainguard", "--version"]
+              command: ["/usr/local/bin/volatix", "--version"]
             initialDelaySeconds: 1
             periodSeconds: 5
             failureThreshold: 12

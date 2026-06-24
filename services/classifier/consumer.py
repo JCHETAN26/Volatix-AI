@@ -50,7 +50,7 @@ class Config:
             brokers=os.getenv("KAFKA_BROKERS", "chain-kafka.default.svc.cluster.local:9092"),
             in_topic=os.getenv("INPUT_TOPIC", "financial-features"),
             out_topic=os.getenv("OUTPUT_TOPIC", "anomaly-scores"),
-            group_id=os.getenv("CONSUMER_GROUP", "chainguard-classifier"),
+            group_id=os.getenv("CONSUMER_GROUP", "volatix-classifier"),
             model_path=Path(os.getenv("MODEL_PATH", "/models/baseline.txt")),
             score_threshold=float(os.getenv("SCORE_THRESHOLD", "0.85")),
             write_to_postgres=os.getenv("WRITE_POSTGRES", "true").lower() == "true",
@@ -66,7 +66,7 @@ def make_consumer(cfg: Config) -> KafkaConsumer:
         auto_offset_reset="earliest",
         enable_auto_commit=True,
         value_deserializer=lambda v: v,  # raw bytes — we struct.unpack ourselves
-        client_id="chainguard-classifier",
+        client_id="volatix-classifier",
     )
 
 
@@ -75,7 +75,7 @@ def make_producer(cfg: Config) -> KafkaProducer:
         bootstrap_servers=cfg.brokers,
         value_serializer=lambda v: json.dumps(v).encode("utf-8"),
         key_serializer=lambda k: k.encode("utf-8") if isinstance(k, str) else k,
-        client_id="chainguard-classifier",
+        client_id="volatix-classifier",
         linger_ms=5,
     )
 
@@ -83,7 +83,7 @@ def make_producer(cfg: Config) -> KafkaProducer:
 def build_score_payload(frame: FeatureFrame, score: float, threshold: float,
                         score_ts_ns: int) -> dict:
     return {
-        "schema": "chainguard.anomaly_score.v2",
+        "schema": "volatix.anomaly_score.v2",
         "ts_ns": frame.ts_ns,
         "symbol": frame.symbol,
         "score": score,

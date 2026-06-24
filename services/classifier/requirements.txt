@@ -1,4 +1,4 @@
-# ChainGuard-Core classifier service runtime deps.
+# Volatix-AI classifier service runtime deps.
 # Pinned to known-good versions; bump deliberately.
 kafka-python-ng==2.2.3
 lightgbm==4.5.0

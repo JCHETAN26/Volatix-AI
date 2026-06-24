@@ -1,4 +1,4 @@
-"""ChainGuard-Core agent evaluation harness (Phase 6).
+"""Volatix-AI agent evaluation harness (Phase 6).
 
 Ragas + binary-correctness scoring over a curated 200-case fixture,
 replayed through the LangGraph agent cluster nightly via Airflow.

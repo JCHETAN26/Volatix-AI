@@ -1,4 +1,4 @@
-# ChainGuard-Core — docker build context filter.
+# Volatix-AI — docker build context filter.
 # Keep the build context tight: only CMake + src/ are needed for the image.
 
 # VCS / CI

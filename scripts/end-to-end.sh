@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ChainGuard-Core — end-to-end timing test (Phase 5.2 acceptance).
+# Volatix-AI — end-to-end timing test (Phase 5.2 acceptance).
 #
 # Prereqs:
 #   * `demo-up.sh` has the cluster stack running.

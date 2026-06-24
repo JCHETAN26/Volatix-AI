@@ -1,4 +1,4 @@
-// ChainGuard-Core — SIMD JSON tick parser
+// Volatix-AI — SIMD JSON tick parser
 //
 // Phase 2.2. Thin wrapper around simdjson::ondemand that turns raw bytes
 // off the wire into a TickData. Returns std::nullopt on malformed payloads
@@ -18,7 +18,7 @@
 
 #include "tick_data.hpp"
 
-namespace chainguard {
+namespace volatix {
 
 class TickParser {
 public:
@@ -46,4 +46,4 @@ private:
     std::uint64_t parsed_rejected_ = 0;
 };
 
-}  // namespace chainguard
+}  // namespace volatix

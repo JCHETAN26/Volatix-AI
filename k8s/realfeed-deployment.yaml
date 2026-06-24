@@ -1,4 +1,4 @@
-# ChainGuard-Core — Coinbase WS → ChainGuard tick adapter.
+# Volatix-AI — Coinbase WS → Volatix tick adapter.
 #
 # Connects to wss://ws-feed.exchange.coinbase.com (public, no API key)
 # and re-emits each filled trade in our existing tick JSON schema on
@@ -16,7 +16,7 @@ metadata:
   labels:
     app.kubernetes.io/name: realfeed
     app.kubernetes.io/component: tick-source
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   replicas: 1
   selector:
@@ -27,14 +27,14 @@ spec:
       labels:
         app.kubernetes.io/name: realfeed
         app.kubernetes.io/component: tick-source
-        app.kubernetes.io/part-of: chainguard-core
+        app.kubernetes.io/part-of: volatix-core
     spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
         - name: realfeed
-          image: chainguard-realfeed:dev
+          image: volatix-realfeed:dev
           imagePullPolicy: IfNotPresent
           env:
             - name: PRODUCTS
@@ -59,7 +59,7 @@ metadata:
   name: realfeed
   labels:
     app.kubernetes.io/name: realfeed
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   type: ClusterIP
   selector:

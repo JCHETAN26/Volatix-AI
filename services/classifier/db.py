@@ -22,14 +22,14 @@ from .feature_frame import FeatureFrame
 def connect_from_env() -> Connection:
     """Reads DATABASE_URL first, falls back to libpq env vars."""
     if dsn := os.getenv("DATABASE_URL"):
-        return psycopg2.connect(dsn, application_name="chainguard-classifier")
+        return psycopg2.connect(dsn, application_name="volatix-classifier")
     return psycopg2.connect(
         host=os.getenv("PGHOST", "localhost"),
         port=int(os.getenv("PGPORT", "5432")),
         user=os.getenv("PGUSER", "postgres"),
         password=os.getenv("PGPASSWORD", ""),
         dbname=os.getenv("PGDATABASE", "postgres"),
-        application_name="chainguard-classifier",
+        application_name="volatix-classifier",
     )
 
 

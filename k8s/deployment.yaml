@@ -1,60 +1,60 @@
-# ChainGuard-Core — engine Deployment (Phase 3 / Task 3.2).
+# Volatix-AI — engine Deployment (Phase 3 / Task 3.2).
 #
 # Runs the C++ binary in --consume mode against a raw-ticks Kafka topic so
 # KEDA has a real consumer-group lag to scale on. Phase 4 will replace the
 # --consume command with --engine once the WebSocket front-end is reachable
 # from inside the cluster.
 #
-# Image: chainguard-core:dev built from the multi-stage Dockerfile.
-#        For Minikube: `make docker-build && minikube image load chainguard-core:dev`.
+# Image: volatix-core:dev built from the multi-stage Dockerfile.
+#        For Minikube: `make docker-build && minikube image load volatix-core:dev`.
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: chainguard-engine
+  name: volatix-engine
   labels:
-    app.kubernetes.io/name: chainguard-engine
+    app.kubernetes.io/name: volatix-engine
     app.kubernetes.io/component: ingest-engine
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: chainguard-engine-config
+  name: volatix-engine-config
   labels:
-    app.kubernetes.io/name: chainguard-engine
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/name: volatix-engine
+    app.kubernetes.io/part-of: volatix-core
 data:
   # In-cluster service DNS for the Phase 1 Bitnami releases.
   KAFKA_BROKERS: "chain-kafka.default.svc.cluster.local:9092"
   CONSUME_TOPIC: "raw-ticks"
-  CONSUME_GROUP: "chainguard-engine"
+  CONSUME_GROUP: "volatix-engine"
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chainguard-engine
+  name: volatix-engine
   labels:
-    app.kubernetes.io/name: chainguard-engine
+    app.kubernetes.io/name: volatix-engine
     app.kubernetes.io/component: ingest-engine
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   # KEDA's HPA owns replicas at runtime; this is just the boot value.
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: chainguard-engine
+      app.kubernetes.io/name: volatix-engine
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: chainguard-engine
+        app.kubernetes.io/name: volatix-engine
         app.kubernetes.io/component: ingest-engine
-        app.kubernetes.io/part-of: chainguard-core
+        app.kubernetes.io/part-of: volatix-core
     spec:
-      serviceAccountName: chainguard-engine
+      serviceAccountName: volatix-engine
       # Distroless image ships uid 65532; matching here so any volume
       # mounts we add later inherit the right ownership.
       securityContext:
@@ -62,8 +62,8 @@ spec:
         runAsUser: 65532
         fsGroup: 65532
       containers:
-        - name: chainguard
-          image: chainguard-core:dev
+        - name: volatix
+          image: volatix-core:dev
           imagePullPolicy: IfNotPresent
           args:
             - "--consume"
@@ -74,7 +74,7 @@ spec:
             - "$(KAFKA_BROKERS)"
           envFrom:
             - configMapRef:
-                name: chainguard-engine-config
+                name: volatix-engine-config
           resources:
             requests:
               cpu: "100m"
@@ -85,10 +85,10 @@ spec:
           # Distroless has no shell, so the readiness probe just checks
           # that the entrypoint process is still alive. KEDA's lag-based
           # scaling makes this conservative — a real liveness signal
-          # would require a small HTTP server in chainguard (Phase 5).
+          # would require a small HTTP server in volatix (Phase 5).
           startupProbe:
             exec:
-              command: ["/usr/local/bin/chainguard", "--version"]
+              command: ["/usr/local/bin/volatix", "--version"]
             initialDelaySeconds: 1
             periodSeconds: 5
             failureThreshold: 6

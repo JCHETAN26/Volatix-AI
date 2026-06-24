@@ -1,4 +1,4 @@
-// ChainGuard-Core — Boost.Beast WebSocket client
+// Volatix-AI — Boost.Beast WebSocket client
 //
 // Phase 2.2. Synchronous WebSocket reader using Boost.Asio + Boost.Beast.
 // One thread per client; the read loop calls the supplied callback for each
@@ -15,7 +15,7 @@
 #include <string>
 #include <string_view>
 
-namespace chainguard {
+namespace volatix {
 
 // WebSocket URL parts. Parsed from a `[ws|wss]://host[:port]/path` string.
 struct WsTarget {
@@ -56,4 +56,4 @@ private:
     std::atomic<bool> stopped_{false};
 };
 
-}  // namespace chainguard
+}  // namespace volatix

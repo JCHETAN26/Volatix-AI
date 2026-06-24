@@ -1,5 +1,5 @@
 <!--
-ChainGuard-Core PR Template
+Volatix-AI PR Template
 One PR per build-plan task. Keep PRs small, sequenced, and CI-green.
 -->
 

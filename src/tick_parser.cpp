@@ -1,4 +1,4 @@
-// ChainGuard-Core — SIMD JSON tick parser implementation.
+// Volatix-AI — SIMD JSON tick parser implementation.
 //
 // Expected payload shape (Polygon-flavored, also produced by mock-ticker):
 //   {"sym":"AAPL","t":1715923812345000000,"p":192.34,"s":100,"side":"B"}
@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <cstring>
 
-namespace chainguard {
+namespace volatix {
 
 namespace {
 
@@ -103,4 +103,4 @@ std::optional<TickData> TickParser::parse(std::string_view payload) {
     return tick;
 }
 
-}  // namespace chainguard
+}  // namespace volatix

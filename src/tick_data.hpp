@@ -1,4 +1,4 @@
-// ChainGuard-Core — tick data record
+// Volatix-AI — tick data record
 //
 // Phase 2.2. Tightly packed POD representing a single trade print as it
 // comes off the wire. Cache-line aligned and trivially copyable so we can
@@ -9,7 +9,7 @@
 #include <array>
 #include <cstdint>
 
-namespace chainguard {
+namespace volatix {
 
 // Side of the trade relative to the National Best Bid/Offer. Sized as a
 // single byte so the struct stays compact.
@@ -51,4 +51,4 @@ static_assert(std::is_trivially_copyable_v<TickData>,
               "TickData must be trivially copyable so the lock-free ring "
               "in Phase 2.3 can move it with a single memcpy.");
 
-}  // namespace chainguard
+}  // namespace volatix

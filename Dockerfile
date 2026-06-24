@@ -1,4 +1,4 @@
-# ChainGuard-Core — multi-stage container build (Phase 3 / Task 3.1).
+# Volatix-AI — multi-stage container build (Phase 3 / Task 3.1).
 #
 # Stage 1 ("builder"): full Debian toolchain — apt installs the same packages
 #   cpp-ci uses (librdkafka-dev, libsimdjson-dev, libboost-system-dev, libssl-dev)
@@ -10,9 +10,9 @@
 #   layout the linker already knows about. No package manager, no shell,
 #   non-root by default. Target footprint: < 150 MB.
 #
-# Build:    docker build -t chainguard-core:dev .
-# Run:      docker run --rm chainguard-core:dev --version
-# Size:     docker image inspect chainguard-core:dev --format '{{.Size}}'
+# Build:    docker build -t volatix-core:dev .
+# Run:      docker run --rm volatix-core:dev --version
+# Size:     docker image inspect volatix-core:dev --format '{{.Size}}'
 
 # ---------------------------------------------------------------------------
 # Stage 1: builder
@@ -42,17 +42,17 @@ COPY src/ ./src/
 
 RUN cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Release \
     && cmake --build build --parallel \
-    && strip build/bin/chainguard
+    && strip build/bin/volatix
 
 # Resolve the binary's shared-library dependencies into a staging tree so
 # stage 2 can copy them in a single layer. `cp -L --parents` preserves the
-# /usr/lib/x86_64-linux-gnu/... path under /chainguard-deps/.
-RUN mkdir -p /chainguard-deps \
-    && ldd build/bin/chainguard \
+# /usr/lib/x86_64-linux-gnu/... path under /volatix-deps/.
+RUN mkdir -p /volatix-deps \
+    && ldd build/bin/volatix \
        | awk '/=>/ && $3 ~ /^\// {print $3}' \
        | sort -u \
-       | xargs -I {} cp -L --parents {} /chainguard-deps/ \
-    && cp -L --parents /lib64/ld-linux-x86-64.so.2 /chainguard-deps/ 2>/dev/null || true
+       | xargs -I {} cp -L --parents {} /volatix-deps/ \
+    && cp -L --parents /lib64/ld-linux-x86-64.so.2 /volatix-deps/ 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
 # Stage 2: distroless runtime
@@ -60,7 +60,7 @@ RUN mkdir -p /chainguard-deps \
 FROM gcr.io/distroless/cc-debian12:nonroot AS runtime
 
 # OCI labels for image inventory / supply-chain tooling.
-LABEL org.opencontainers.image.title="chainguard-core" \
+LABEL org.opencontainers.image.title="volatix-core" \
       org.opencontainers.image.description="Low-latency streaming feature engine (C++20)" \
       org.opencontainers.image.source="https://github.com/JCHETAN26/Volatix-AI" \
       org.opencontainers.image.licenses="Proprietary"
@@ -69,10 +69,10 @@ LABEL org.opencontainers.image.title="chainguard-core" \
 ENV KAFKA_BROKERS="" \
     WS_URL=""
 
-COPY --from=builder /chainguard-deps/ /
-COPY --from=builder /src/build/bin/chainguard /usr/local/bin/chainguard
+COPY --from=builder /volatix-deps/ /
+COPY --from=builder /src/build/bin/volatix /usr/local/bin/volatix
 
 # `nonroot` (uid=65532) is the default user in distroless/cc-debian12:nonroot.
 USER nonroot
-ENTRYPOINT ["/usr/local/bin/chainguard"]
+ENTRYPOINT ["/usr/local/bin/volatix"]
 CMD ["--version"]

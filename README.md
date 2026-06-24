@@ -1,8 +1,8 @@
-# ChainGuard-Core
+# Volatix-AI
 
 A real-time, low-latency financial threat detection platform combining a C++20 streaming feature-engineering engine, event-driven Kubernetes infrastructure, ML anomaly classification, and a 3-tier agentic reasoning layer.
 
-ChainGuard-Core ingests live market transactions over WebSockets, computes microsecond-scale quantitative features (Order Flow Imbalance, Realized Volatility) directly on hardware SIMD lanes, classifies anomalies with LightGBM, and triggers an autonomous LangGraph agent cluster that investigates, audits, and enforces freezes on high-confidence fraud — all visualized through a Next.js 15 analytical control board.
+Volatix-AI ingests live market transactions over WebSockets, computes microsecond-scale quantitative features (Order Flow Imbalance, Realized Volatility) directly on hardware SIMD lanes, classifies anomalies with LightGBM, and triggers an autonomous LangGraph agent cluster that investigates, audits, and enforces freezes on high-confidence fraud — all visualized through a Next.js 15 analytical control board.
 
 ---
 
@@ -134,7 +134,7 @@ make cpp-run         # build + execute (no broker contact)
 Verify the Kafka producer link (requires `make port-forward-kafka` in another terminal, or pass `KAFKA_BROKERS=host:port`):
 ```bash
 make cpp-probe       # metadata request only — confirms reachability
-make cpp-smoke       # produces 10 records to chainguard.smoke; fails if any drop
+make cpp-smoke       # produces 10 records to volatix.smoke; fails if any drop
 ```
 
 WebSocket ingest + SIMD JSON parsing (Phase 2.2):
@@ -148,15 +148,15 @@ make cpp-throughput                   # in-process benchmark; fails below 20k tp
 
 Container image (Phase 3.1):
 ```bash
-make docker-build     # multi-stage build → chainguard-core:dev
+make docker-build     # multi-stage build → volatix-core:dev
 make docker-size      # enforces the <150MB acceptance ceiling
-make docker-run       # docker run --rm chainguard-core:dev --version
+make docker-run       # docker run --rm volatix-core:dev --version
 ```
 The Dockerfile uses `debian:bookworm-slim` for the build stage and `gcr.io/distroless/cc-debian12:nonroot` for the runtime stage. Shared library deps are auto-resolved via `ldd` and copied into the final image; no shell, no package manager, runs as uid 65532 by default.
 
 Kubernetes + KEDA (Phase 3.2):
 ```bash
-make image-load       # docker-build + minikube image load chainguard-core:dev
+make image-load       # docker-build + minikube image load volatix-core:dev
 make keda-install     # helm install kedacore/keda into the keda namespace
 make k8s-deploy       # apply k8s/deployment.yaml + k8s/keda-scaledobject.yaml
 make watch-pods       # tail replicas + the KEDA-managed HPA
@@ -164,9 +164,9 @@ make watch-pods       # tail replicas + the KEDA-managed HPA
 # Acceptance: flood raw-ticks with 50k records, watch the Deployment scale 1 → 5
 make flood-kafka      # ephemeral kafka-console-producer pod, 50,000 messages
                       # KEDA sees lag ≥ 50k, lagThreshold=10k → desired = 5 replicas
-                      # once chainguard-engine drains the backlog, replicas → 1
+                      # once volatix-engine drains the backlog, replicas → 1
 ```
-The Deployment runs `chainguard --consume raw-ticks --group chainguard-engine` so KEDA has a real consumer-group lag to scale on. The ScaledObject's kafka trigger polls every 10s and uses a 60s scale-down cooldown.
+The Deployment runs `volatix --consume raw-ticks --group volatix-engine` so KEDA has a real consumer-group lag to scale on. The ScaledObject's kafka trigger polls every 10s and uses a 60s scale-down cooldown.
 
 Full feature pipeline (Phase 2.3):
 ```bash
@@ -197,14 +197,14 @@ export PKG_CONFIG_PATH="$(brew --prefix openssl)/lib/pkgconfig:$(brew --prefix l
 make init-postgres
 
 # Make sure the cluster can talk to Supabase
-make set-db-url                       # syncs $DATABASE_URL into the chainguard-db Secret
+make set-db-url                       # syncs $DATABASE_URL into the volatix-db Secret
 
 # Build + load the Python classifier image (bakes a baseline LightGBM
 # model from synthetic data so the service can boot cold)
 make classifier-load
 make classifier-deploy
 
-# Install Airflow with the chainguard retraining DAG mounted in
+# Install Airflow with the volatix retraining DAG mounted in
 make airflow-install
 make airflow-ui                       # → http://localhost:8080 (admin/admin)
 
@@ -250,7 +250,7 @@ echo "DATABASE_URL=${DATABASE_URL}" > web/.env.local
 make web-install && make web-dev      # http://localhost:3000
 ```
 
-After `demo-up`, the cluster is running a complete in-K8s pipeline by default — mock-ticker → chainguard-engine-live → Kafka → classifier → agents → Supabase → dashboard. The dashboard immediately starts showing live scores.
+After `demo-up`, the cluster is running a complete in-K8s pipeline by default — mock-ticker → volatix-engine-live → Kafka → classifier → agents → Supabase → dashboard. The dashboard immediately starts showing live scores.
 
 **Switch which source feeds the engine on cue:**
 ```bash
@@ -277,13 +277,13 @@ python3 scripts/exploit-ws.py         # 200-frame flash-loan burst on :8766
 **KEDA autoscaling demo (separate from the live pipeline):**
 ```bash
 make watch-pods &                     # in one tab
-make flood-kafka                      # 50k records → chainguard-engine scales 1→5
+make flood-kafka                      # 50k records → volatix-engine scales 1→5
 ```
 
 **Airflow retraining DAG demo:**
 ```bash
 make airflow-install && make airflow-ui   # http://localhost:8080  admin/admin
-# Trigger chainguard_retraining manually from the UI — spawns a
+# Trigger volatix_retraining manually from the UI — spawns a
 # KubernetesPodOperator pod that retrains LightGBM via Purged K-Fold
 # against yesterday's feature_log slice and writes the model into
 # model_registry.
@@ -400,7 +400,7 @@ agent thinking it works.
 - **Prompt version tagging** — every `agent_report` row carries a
   `prompt_version` column; the eval runner records `(prompt_version,
   fixture_revision)` so regression is per-version, not per-day.
-- **Nightly Airflow DAG** (`airflow/dags/chainguard_eval.py`) — same
+- **Nightly Airflow DAG** (`airflow/dags/volatix_eval.py`) — same
   KubernetesPodOperator pattern as the LightGBM retraining DAG. Spawns
   an ephemeral 3GB pod from the agents image, runs the eval, writes
   one `eval_run` row + 200 `eval_case_result` rows to Supabase.
@@ -417,8 +417,8 @@ change reaches production.
 To trigger a run by hand (instead of waiting for the DAG):
 
 ```bash
-kubectl run chainguard-eval-once \
-    --image=chainguard-agents:dev --restart=Never \
+kubectl run volatix-eval-once \
+    --image=volatix-agents:dev --restart=Never \
     --env=DATABASE_URL="$DATABASE_URL" \
     --env=GOOGLE_API_KEY="$GOOGLE_API_KEY" \
     --env=QDRANT_URL=http://vector-db.default.svc.cluster.local:6333 \

@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ChainGuard Control Board",
+  title: "Volatix Control Board",
   description:
-    "Low-latency anomaly detection telemetry for the ChainGuard-Core engine.",
+    "Low-latency anomaly detection telemetry for the Volatix-AI engine.",
 };
 
 export default function RootLayout({

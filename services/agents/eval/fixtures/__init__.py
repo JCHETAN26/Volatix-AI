@@ -21,6 +21,6 @@ def load_cases() -> dict[str, Any]:
             f"{FIXTURE_PATH} missing — run `python -m agents.eval.fixtures.build`"
         )
     data = json.loads(FIXTURE_PATH.read_text())
-    if data.get("schema") != "chainguard.eval.fixture.v1":
+    if data.get("schema") != "volatix.eval.fixture.v1":
         raise ValueError(f"unexpected fixture schema: {data.get('schema')!r}")
     return data

@@ -1,4 +1,4 @@
-// ChainGuard-Core — Single-Producer / Single-Consumer lock-free ring.
+// Volatix-AI — Single-Producer / Single-Consumer lock-free ring.
 //
 // Phase 2.3. The ingest thread (WebSocket+parser) pushes TickData into the
 // ring; the feature thread pops it and updates the OFI / Realized-Volatility
@@ -15,7 +15,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace chainguard {
+namespace volatix {
 
 template <typename T, std::size_t Capacity>
 class SpscRing {
@@ -73,4 +73,4 @@ private:
     alignas(64) std::array<T, Capacity> buf_{};
 };
 
-}  // namespace chainguard
+}  // namespace volatix

@@ -1,4 +1,4 @@
-# ChainGuard-Core — developer convenience Makefile
+# Volatix-AI — developer convenience Makefile
 # Phase 1+: wraps the most common Minikube / Helm / kubectl flows so you can
 # bring the whole local stack up with `make infra-up` and verify with
 # `make validate`.
@@ -40,7 +40,7 @@ infra-nuke:  ## DESTRUCTIVE: delete the Minikube cluster entirely
 	./scripts/teardown-infra.sh --nuke
 
 .PHONY: pods
-pods:  ## Show pods in the chainguard namespace
+pods:  ## Show pods in the volatix namespace
 	kubectl get pods -n $(NAMESPACE)
 
 # ---------------------------------------------------------------------------
@@ -68,9 +68,9 @@ port-forward-kafka:  ## Forward Kafka 9092 to localhost
 # Managed Postgres (Supabase) helpers
 # ---------------------------------------------------------------------------
 .PHONY: set-db-url
-set-db-url:  ## Sync $$DATABASE_URL into the chainguard-db k8s Secret
+set-db-url:  ## Sync $$DATABASE_URL into the volatix-db k8s Secret
 	@test -n "$$DATABASE_URL" || (echo "set DATABASE_URL first (Supabase URL)" && exit 1)
-	kubectl create secret generic chainguard-db \
+	kubectl create secret generic volatix-db \
 	    --from-literal=DATABASE_URL="$$DATABASE_URL" \
 	    --dry-run=client -o yaml | kubectl apply -f -
 
@@ -83,39 +83,39 @@ cpp-build:  ## Configure + build the C++ engine
 	cmake --build build --parallel
 
 .PHONY: cpp-run
-cpp-run: cpp-build  ## Run the chainguard binary (no-op build smoke)
-	./build/bin/chainguard
+cpp-run: cpp-build  ## Run the volatix binary (no-op build smoke)
+	./build/bin/volatix
 
 .PHONY: cpp-probe
 cpp-probe: cpp-build  ## Verify Kafka broker connectivity (needs port-forward-kafka)
-	./build/bin/chainguard --probe --brokers $${KAFKA_BROKERS:-localhost:9092}
+	./build/bin/volatix --probe --brokers $${KAFKA_BROKERS:-localhost:9092}
 
 .PHONY: cpp-smoke
 cpp-smoke: cpp-build  ## Produce 10 records and verify zero drops (Phase 2.1 acceptance)
-	./build/bin/chainguard --smoke --brokers $${KAFKA_BROKERS:-localhost:9092}
+	./build/bin/volatix --smoke --brokers $${KAFKA_BROKERS:-localhost:9092}
 
 .PHONY: cpp-ingest
 cpp-ingest: cpp-build  ## Stream a WebSocket and parse ticks (Ctrl-C to stop)
-	./build/bin/chainguard --ingest --ws-url $${WS_URL:-ws://localhost:8765/}
+	./build/bin/volatix --ingest --ws-url $${WS_URL:-ws://localhost:8765/}
 
 .PHONY: cpp-throughput
 cpp-throughput: cpp-build  ## Benchmark parser (Phase 2.2 acceptance: ≥20k tps)
-	./build/bin/chainguard --throughput-test $${THROUGHPUT_N:-1000000}
+	./build/bin/volatix --throughput-test $${THROUGHPUT_N:-1000000}
 
 .PHONY: cpp-engine
 cpp-engine: cpp-build  ## Full pipeline: WS → ring → features → Kafka topic 'financial-features'
-	./build/bin/chainguard --engine \
+	./build/bin/volatix --engine \
 		--ws-url $${WS_URL:-ws://localhost:8765/} \
 		--brokers $${KAFKA_BROKERS:-localhost:9092}
 
 .PHONY: cpp-feature-bench
 cpp-feature-bench: cpp-build  ## Frame-gen latency bench (Phase 2.3 acceptance: median <50µs)
-	./build/bin/chainguard --feature-bench
+	./build/bin/volatix --feature-bench
 
 # ---------------------------------------------------------------------------
 # Phase 3 — Container image
 # ---------------------------------------------------------------------------
-IMAGE_NAME ?= chainguard-core
+IMAGE_NAME ?= volatix-core
 IMAGE_TAG  ?= dev
 
 .PHONY: docker-build
@@ -160,7 +160,7 @@ k8s-deploy:  ## Apply k8s/deployment.yaml + k8s/keda-scaledobject.yaml
 	kubectl apply -f k8s/keda-scaledobject.yaml
 
 .PHONY: k8s-undeploy
-k8s-undeploy:  ## Tear down the chainguard Deployment + ScaledObject
+k8s-undeploy:  ## Tear down the volatix Deployment + ScaledObject
 	kubectl delete -f k8s/keda-scaledobject.yaml --ignore-not-found
 	kubectl delete -f k8s/deployment.yaml --ignore-not-found
 
@@ -169,14 +169,14 @@ flood-kafka:  ## Phase 3.2 acceptance: 50k records → KEDA scale-out
 	./scripts/flood-kafka.sh $${FLOOD_N:-50000}
 
 .PHONY: watch-pods
-watch-pods:  ## Watch chainguard pods + the KEDA-managed HPA
+watch-pods:  ## Watch volatix pods + the KEDA-managed HPA
 	@echo "Ctrl-C to stop."
-	kubectl get pods,hpa -l app.kubernetes.io/name=chainguard-engine --watch
+	kubectl get pods,hpa -l app.kubernetes.io/name=volatix-engine --watch
 
 # ---------------------------------------------------------------------------
 # Phase 4.1 — Python classifier + Airflow
 # ---------------------------------------------------------------------------
-CLASSIFIER_IMAGE_NAME ?= chainguard-classifier
+CLASSIFIER_IMAGE_NAME ?= volatix-classifier
 CLASSIFIER_IMAGE_TAG  ?= dev
 
 .PHONY: init-postgres
@@ -219,7 +219,7 @@ airflow-ui:  ## Port-forward the Airflow webserver to localhost:8080
 # ---------------------------------------------------------------------------
 # Phase 4.2 — LangGraph 3-tier agent cluster
 # ---------------------------------------------------------------------------
-AGENTS_IMAGE_NAME ?= chainguard-agents
+AGENTS_IMAGE_NAME ?= volatix-agents
 AGENTS_IMAGE_TAG  ?= dev
 
 .PHONY: agents-test
@@ -251,7 +251,7 @@ agents-undeploy:  ## Remove the agents Deployment + ConfigMap + Secret
 .PHONY: agents-set-openai-key
 agents-set-openai-key:  ## Inject OPENAI_API_KEY env into the Secret (reads $$OPENAI_API_KEY)
 	@test -n "$$OPENAI_API_KEY" || (echo "set OPENAI_API_KEY first" && exit 1)
-	kubectl create secret generic chainguard-agents-secrets \
+	kubectl create secret generic volatix-agents-secrets \
 	    --from-literal=OPENAI_API_KEY=$$OPENAI_API_KEY \
 	    --dry-run=client -o yaml | kubectl apply -f -
 
@@ -310,11 +310,11 @@ end-to-end:  ## Phase 5.2 acceptance: inject → DB row, prints latency
 # ---------------------------------------------------------------------------
 # Post-1.0 — In-cluster live pipeline (mock-ticker + Coinbase realfeed
 # + a second engine deployment in --engine mode). The original
-# chainguard-engine deployment stays in --consume mode for the KEDA demo.
+# volatix-engine deployment stays in --consume mode for the KEDA demo.
 # ---------------------------------------------------------------------------
-MOCK_TICKER_IMAGE_NAME ?= chainguard-mock-ticker
+MOCK_TICKER_IMAGE_NAME ?= volatix-mock-ticker
 MOCK_TICKER_IMAGE_TAG  ?= dev
-REALFEED_IMAGE_NAME    ?= chainguard-realfeed
+REALFEED_IMAGE_NAME    ?= volatix-realfeed
 REALFEED_IMAGE_TAG     ?= dev
 
 .PHONY: mock-ticker-build
@@ -341,7 +341,7 @@ tickers-deploy:  ## Deploy mock-ticker + realfeed as in-cluster Services
 	kubectl apply -f k8s/realfeed-deployment.yaml
 
 .PHONY: engine-live-deploy
-engine-live-deploy:  ## Deploy chainguard-engine-live (--engine mode, drives the dashboard)
+engine-live-deploy:  ## Deploy volatix-engine-live (--engine mode, drives the dashboard)
 	kubectl apply -f k8s/engine-live-deployment.yaml
 
 .PHONY: engine-live-undeploy
@@ -352,19 +352,19 @@ engine-live-undeploy:  ## Remove the live engine + ticker Deployments
 
 .PHONY: swap-to-mock
 swap-to-mock:  ## Point the live engine at the in-cluster mock-ticker (controllable demo)
-	kubectl set env deployment/chainguard-engine-live \
+	kubectl set env deployment/volatix-engine-live \
 	    WS_URL=ws://mock-ticker.default.svc.cluster.local:8765/
-	kubectl rollout status deployment/chainguard-engine-live --timeout=60s
+	kubectl rollout status deployment/volatix-engine-live --timeout=60s
 
 .PHONY: swap-to-realfeed
 swap-to-realfeed:  ## Point the live engine at the Coinbase WS adapter (real BTC trades)
-	kubectl set env deployment/chainguard-engine-live \
+	kubectl set env deployment/volatix-engine-live \
 	    WS_URL=ws://realfeed.default.svc.cluster.local:8765/
-	kubectl rollout status deployment/chainguard-engine-live --timeout=60s
+	kubectl rollout status deployment/volatix-engine-live --timeout=60s
 
 .PHONY: which-feed
 which-feed:  ## Show which WS source the live engine is currently consuming
-	@kubectl get deployment chainguard-engine-live \
+	@kubectl get deployment volatix-engine-live \
 	    -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="WS_URL")].value}{"\n"}'
 
 .PHONY: mock-ticker

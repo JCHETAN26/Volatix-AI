@@ -1,4 +1,4 @@
-# ChainGuard-Core C++ formatting rules.
+# Volatix-AI C++ formatting rules.
 # Phase 0.2 — used by cpp-ci to enforce style on every PR.
 ---
 Language: Cpp

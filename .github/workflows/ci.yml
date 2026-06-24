@@ -144,7 +144,7 @@ jobs:
         run: cmake --build build --parallel
 
       - name: Smoke test binary
-        run: ./build/bin/chainguard
+        run: ./build/bin/volatix
 
   # ----------------------------------------------------------------------
   # Python services + Airflow DAGs.
@@ -202,17 +202,17 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          tags: chainguard-core:ci
+          tags: volatix-core:ci
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Run --version smoke
-        run: docker run --rm chainguard-core:ci --version
+        run: docker run --rm volatix-core:ci --version
 
       - name: Enforce <150MB ceiling
         run: |
-          bytes=$(docker image inspect chainguard-core:ci --format '{{.Size}}')
+          bytes=$(docker image inspect volatix-core:ci --format '{{.Size}}')
           mb=$(( bytes / 1024 / 1024 ))
           echo "image size: ${mb} MB"
           if [ "${mb}" -ge 150 ]; then

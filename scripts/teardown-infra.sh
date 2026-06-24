@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ChainGuard-Core — Local infrastructure teardown
+# Volatix-AI — Local infrastructure teardown
 # Phase 1 helper. Removes everything bootstrap-infra.sh installs.
 #
 # Usage:

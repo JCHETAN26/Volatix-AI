@@ -18,7 +18,7 @@ export interface AnomalyScoreRow {
 // Structured shape of the agent_report.evidence JSONB column. Schema
 // tagged so future migrations can fan out; today only v1 exists.
 export interface AgentEvidence {
-  schema?: "chainguard.agent_evidence.v1" | string;
+  schema?: "volatix.agent_evidence.v1" | string;
   features?: Record<string, number>;
   rag_matches?: Array<{
     attack_id: string;

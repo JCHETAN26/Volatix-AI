@@ -76,7 +76,7 @@ def test_high_confidence_path_enforces():
     assert final.confidence >= 0.95
     assert final.enforcement_action is not None
     assert final.enforcement_action.target == "AAPL"
-    assert "# ChainGuard Audit Report" in final.rationale_md
+    assert "# Volatix Audit Report" in final.rationale_md
     assert "**enforced**: True" in final.rationale_md
 
 
@@ -91,7 +91,7 @@ def test_low_confidence_path_skips_enforcer():
 
     assert final.confidence < 0.95
     assert final.enforcement_action is None
-    assert "# ChainGuard Audit Report" in final.rationale_md
+    assert "# Volatix Audit Report" in final.rationale_md
     assert "**enforced**: False" in final.rationale_md
 
 
