@@ -1,4 +1,4 @@
-# ChainGuard-Core — in-cluster mock-ticker (post-1.0 live demo).
+# Volatix-AI — in-cluster mock-ticker (post-1.0 live demo).
 #
 # Same synthetic Polygon-flavored feed that scripts/mock-ticker.py
 # generates locally, deployed as a K8s Service so the in-cluster engine
@@ -13,7 +13,7 @@ metadata:
   labels:
     app.kubernetes.io/name: mock-ticker
     app.kubernetes.io/component: tick-source
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   replicas: 1
   selector:
@@ -24,14 +24,14 @@ spec:
       labels:
         app.kubernetes.io/name: mock-ticker
         app.kubernetes.io/component: tick-source
-        app.kubernetes.io/part-of: chainguard-core
+        app.kubernetes.io/part-of: volatix-core
     spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
         - name: mock-ticker
-          image: chainguard-mock-ticker:dev
+          image: volatix-mock-ticker:dev
           imagePullPolicy: IfNotPresent
           args:
             - "--host"
@@ -58,7 +58,7 @@ metadata:
   name: mock-ticker
   labels:
     app.kubernetes.io/name: mock-ticker
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   type: ClusterIP
   selector:

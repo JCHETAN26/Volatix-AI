@@ -16,14 +16,14 @@ from psycopg2.extras import Json
 
 def connect_from_env() -> Connection:
     if dsn := os.getenv("DATABASE_URL"):
-        return psycopg2.connect(dsn, application_name="chainguard-agents")
+        return psycopg2.connect(dsn, application_name="volatix-agents")
     return psycopg2.connect(
         host=os.getenv("PGHOST", "localhost"),
         port=int(os.getenv("PGPORT", "5432")),
         user=os.getenv("PGUSER", "postgres"),
         password=os.getenv("PGPASSWORD", ""),
         dbname=os.getenv("PGDATABASE", "postgres"),
-        application_name="chainguard-agents",
+        application_name="volatix-agents",
     )
 
 

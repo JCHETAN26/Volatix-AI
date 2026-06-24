@@ -1,11 +1,11 @@
-// ChainGuard-Core — feature kernel implementations.
+// Volatix-AI — feature kernel implementations.
 
 #include "features.hpp"
 
 #include <algorithm>
 #include <cmath>
 
-namespace chainguard {
+namespace volatix {
 
 // ---------------------------------------------------------------------------
 // OfiWindow
@@ -115,4 +115,4 @@ double RealizedVolWindow::value() const noexcept {
     return std::sqrt(sq / static_cast<double>(count_ - 1));
 }
 
-}  // namespace chainguard
+}  // namespace volatix

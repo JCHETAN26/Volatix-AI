@@ -1,4 +1,4 @@
-# ChainGuard-Core — Build Plan
+# Volatix-AI — Build Plan
 
 > A concrete, sequenced plan for the builder LLM. Read alongside [`README.md`](./README.md) (product spec) and `system-prompt.md` (operating principles).
 >
@@ -395,7 +395,7 @@ correctness.
 ---
 
 ### Task 6.4 — Nightly Airflow DAG
-**Deliverable:** `airflow/dags/chainguard_eval.py` — runs the eval runner
+**Deliverable:** `airflow/dags/volatix_eval.py` — runs the eval runner
 nightly via KubernetesPodOperator, same pattern as the existing LightGBM
 retraining DAG.
 

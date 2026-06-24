@@ -1,6 +1,6 @@
-# ChainGuard Web — Analytical Control Board
+# Volatix-AI Web — Analytical Control Board
 
-Next.js 15 (App Router) dashboard for the ChainGuard-Core engine. Reads
+Next.js 15 (App Router) dashboard for the Volatix-AI engine. Reads
 directly from PostgreSQL (`agent_report`, `anomaly_score_log`,
 `model_registry`) and streams live updates via Server-Sent Events.
 

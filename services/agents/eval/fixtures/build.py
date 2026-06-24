@@ -154,7 +154,7 @@ def main() -> int:
     out = {
         "revision": revision,
         "count": len(payload),
-        "schema": "chainguard.eval.fixture.v1",
+        "schema": "volatix.eval.fixture.v1",
         "cases": payload,
     }
     FIXTURE_PATH.write_text(json.dumps(out, indent=2, sort_keys=True) + "\n")

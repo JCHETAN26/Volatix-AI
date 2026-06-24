@@ -1,4 +1,4 @@
--- ChainGuard-Core — operational schema.
+-- Volatix-AI — operational schema.
 -- Apply once after `make infra-up`: `make init-postgres`.
 --
 -- Tables:

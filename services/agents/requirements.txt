@@ -1,4 +1,4 @@
-# ChainGuard-Core agents service runtime deps.
+# Volatix-AI agents service runtime deps.
 # LangGraph + langchain-core power the 3-tier graph. langchain-openai and
 # langchain-ollama are both installed so LLM_PROVIDER can pick either at
 # runtime; the mock provider has zero extra deps.

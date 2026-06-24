@@ -166,7 +166,7 @@ export default async function DashboardPage() {
       <header className="flex flex-wrap items-end gap-4 justify-between">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">
-            ChainGuard Control Board
+            Volatix Control Board
           </h1>
           <p className="text-sm text-white/50 mt-1 max-w-2xl">
             Live telemetry from the C++ ingestion engine, the LightGBM

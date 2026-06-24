@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# ChainGuard-Core — flood a Kafka topic for the Phase 3.2 KEDA test.
+# Volatix-AI — flood a Kafka topic for the Phase 3.2 KEDA test.
 #
-# Produces N records into `raw-ticks` so the chainguard consumer group
+# Produces N records into `raw-ticks` so the volatix consumer group
 # builds up enough lag for KEDA to scale the Deployment out. Runs inside
 # an ephemeral Bitnami kafka client pod so we don't need a host-side
 # librdkafka install.
@@ -35,7 +35,7 @@ kubectl run kafka-flood-$$ \
     --namespace "${NAMESPACE}" \
     --command -- bash -c "
         seq 1 ${COUNT} \
-            | awk '{print \"chainguard-flood-\" \$1}' \
+            | awk '{print \"volatix-flood-\" \$1}' \
             | kafka-console-producer.sh \
                 --bootstrap-server ${BROKER} \
                 --topic ${TOPIC} \
@@ -45,5 +45,5 @@ kubectl run kafka-flood-$$ \
 
 ok "Done. ${COUNT} records written to ${TOPIC}."
 echo "Tip: watch KEDA react with:"
-echo "  kubectl get pods -l app.kubernetes.io/name=chainguard-engine --watch"
-echo "  kubectl get hpa keda-hpa-chainguard-engine --watch"
+echo "  kubectl get pods -l app.kubernetes.io/name=volatix-engine --watch"
+echo "  kubectl get hpa keda-hpa-volatix-engine --watch"

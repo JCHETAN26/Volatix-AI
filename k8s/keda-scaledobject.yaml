@@ -1,6 +1,6 @@
-# ChainGuard-Core — KEDA ScaledObject (Phase 3 / Task 3.2).
+# Volatix-AI — KEDA ScaledObject (Phase 3 / Task 3.2).
 #
-# Scales the chainguard-engine Deployment based on consumer-group lag on
+# Scales the volatix-engine Deployment based on consumer-group lag on
 # the raw-ticks topic. With lagThreshold=10000 and 50,000 backlogged
 # records (the build-plan acceptance scenario), KEDA's kafka scaler will
 # compute desired = ceil(50000 / 10000) = 5 replicas and the HPA scales
@@ -11,14 +11,14 @@
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: chainguard-engine
+  name: volatix-engine
   labels:
-    app.kubernetes.io/name: chainguard-engine
+    app.kubernetes.io/name: volatix-engine
     app.kubernetes.io/component: autoscaler
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   scaleTargetRef:
-    name: chainguard-engine
+    name: volatix-engine
   pollingInterval: 10  # seconds between lag samples
   cooldownPeriod: 60   # wait 60s of below-threshold before scaling down
   minReplicaCount: 1
@@ -27,7 +27,7 @@ spec:
     - type: kafka
       metadata:
         bootstrapServers: chain-kafka.default.svc.cluster.local:9092
-        consumerGroup: chainguard-engine
+        consumerGroup: volatix-engine
         topic: raw-ticks
         lagThreshold: "10000"
         offsetResetPolicy: earliest

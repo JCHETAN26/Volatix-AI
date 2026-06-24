@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ChainGuard-Core — Local infrastructure bootstrap
+# Volatix-AI — Local infrastructure bootstrap
 # Phase 1 / Task 1.1 + 1.2.
 #
 # Idempotent. Brings up:
@@ -121,7 +121,7 @@ Connection hints (cluster-internal DNS):
 
 PostgreSQL is managed (Supabase). Export DATABASE_URL=postgres://... and run:
   make init-postgres      # applies scripts/sql/init.sql to Supabase
-  make set-db-url         # syncs the URL into the chainguard-db k8s Secret
+  make set-db-url         # syncs the URL into the volatix-db k8s Secret
 
 To validate from your laptop:
   make validate           # runs the vector-db validator

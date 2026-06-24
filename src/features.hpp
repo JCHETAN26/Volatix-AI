@@ -1,4 +1,4 @@
-// ChainGuard-Core — streaming feature kernels.
+// Volatix-AI — streaming feature kernels.
 //
 // Phase 2.3. Single-threaded, allocation-free updates on the consumer
 // side of the SPSC ring. No mutexes, no system calls in the hot path.
@@ -18,7 +18,7 @@
 
 #include "tick_data.hpp"
 
-namespace chainguard {
+namespace volatix {
 
 // ---------------------------------------------------------------------------
 // Order Flow Imbalance
@@ -90,4 +90,4 @@ private:
     double last_price_ = 0.0;
 };
 
-}  // namespace chainguard
+}  // namespace volatix

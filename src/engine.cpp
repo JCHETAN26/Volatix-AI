@@ -1,4 +1,4 @@
-// ChainGuard-Core — feature engine pipeline implementation.
+// Volatix-AI — feature engine pipeline implementation.
 
 #include "engine.hpp"
 
@@ -27,7 +27,7 @@
 #include "tick_parser.hpp"
 #include "ws_client.hpp"
 
-namespace chainguard {
+namespace volatix {
 
 namespace {
 
@@ -56,7 +56,7 @@ std::unique_ptr<RdKafka::Producer> make_engine_producer(const std::string& broke
     std::unique_ptr<RdKafka::Conf> conf(RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL));
     if (!conf_set(*conf, "bootstrap.servers", brokers))
         return nullptr;
-    if (!conf_set(*conf, "client.id", "chainguard-engine"))
+    if (!conf_set(*conf, "client.id", "volatix-engine"))
         return nullptr;
     if (!conf_set(*conf, "socket.timeout.ms", "5000"))
         return nullptr;
@@ -141,7 +141,7 @@ int run_engine(const EngineConfig& cfg) {
     std::atomic<std::uint64_t> popped{0};
     std::atomic<std::uint64_t> frames_emitted{0};
 
-    std::cout << "chainguard engine\n"
+    std::cout << "volatix engine\n"
               << "  ws_url:        " << cfg.ws_url << '\n'
               << "  brokers:       " << cfg.brokers << '\n'
               << "  topic:         " << cfg.topic << '\n'
@@ -310,7 +310,7 @@ int run_consume(const std::string& brokers, const std::string& topic, const std:
 
     std::atomic<std::uint64_t> consumed{0};
 
-    std::cout << "chainguard consume\n"
+    std::cout << "volatix consume\n"
               << "  brokers: " << brokers << '\n'
               << "  topic:   " << topic << '\n'
               << "  group:   " << group << '\n';
@@ -361,7 +361,7 @@ int run_feature_bench(int prefill_ticks, int frame_iterations) {
     if (frame_iterations <= 0)
         frame_iterations = 100'000;
 
-    std::cout << "chainguard feature-bench\n"
+    std::cout << "volatix feature-bench\n"
               << "  prefill ticks:    " << prefill_ticks << '\n'
               << "  frame iterations: " << frame_iterations << '\n';
 
@@ -418,4 +418,4 @@ int run_feature_bench(int prefill_ticks, int frame_iterations) {
     return EXIT_SUCCESS;
 }
 
-}  // namespace chainguard
+}  // namespace volatix

@@ -44,7 +44,7 @@ export default async function EvalPage() {
       ) : runs.length === 0 ? (
         <EmptyMsg
           title="No eval runs yet"
-          body="Trigger the chainguard_eval Airflow DAG (or run python -m agents.eval.runner inside a pod with DATABASE_URL set) to populate this page."
+          body="Trigger the volatix_eval Airflow DAG (or run python -m agents.eval.runner inside a pod with DATABASE_URL set) to populate this page."
         />
       ) : (
         <EvalBoard initialRuns={runs} />

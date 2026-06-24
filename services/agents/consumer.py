@@ -49,7 +49,7 @@ class Config:
         return cls(
             brokers=os.getenv("KAFKA_BROKERS", "chain-kafka.default.svc.cluster.local:9092"),
             in_topic=os.getenv("INPUT_TOPIC", "anomaly-scores"),
-            group_id=os.getenv("CONSUMER_GROUP", "chainguard-agents"),
+            group_id=os.getenv("CONSUMER_GROUP", "volatix-agents"),
             write_to_postgres=os.getenv("WRITE_POSTGRES", "true").lower() == "true",
             poll_timeout_ms=int(os.getenv("POLL_TIMEOUT_MS", "1000")),
             high_risk_only=os.getenv("HIGH_RISK_ONLY", "true").lower() == "true",
@@ -64,7 +64,7 @@ def _make_consumer(cfg: Config) -> KafkaConsumer:
         auto_offset_reset="earliest",
         enable_auto_commit=True,
         value_deserializer=lambda v: json.loads(v.decode("utf-8")),
-        client_id="chainguard-agents",
+        client_id="volatix-agents",
     )
 
 
@@ -173,7 +173,7 @@ class AgentService:
             # decision without re-running anything. Shape is documented
             # in web/lib/types.ts as AgentReportEvidence.
             evidence = {
-                "schema": "chainguard.agent_evidence.v1",
+                "schema": "volatix.agent_evidence.v1",
                 "features": state.features,
                 "rag_matches": [m.model_dump() for m in state.rag_matches],
                 "stages": {

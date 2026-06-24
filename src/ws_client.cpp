@@ -1,4 +1,4 @@
-// ChainGuard-Core — Boost.Beast WebSocket client implementation.
+// Volatix-AI — Boost.Beast WebSocket client implementation.
 //
 // Synchronous I/O. Beast's async API is more idiomatic for high fan-out
 // servers, but a single-WS-stream consumer is simpler and faster on the
@@ -21,7 +21,7 @@
 #include <boost/beast/websocket.hpp>
 #include <boost/beast/websocket/ssl.hpp>
 
-namespace chainguard {
+namespace volatix {
 
 namespace asio = boost::asio;
 namespace beast = boost::beast;
@@ -126,4 +126,4 @@ void WsClient::run() {
     }
 }
 
-}  // namespace chainguard
+}  // namespace volatix

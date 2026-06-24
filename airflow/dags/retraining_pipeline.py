@@ -1,6 +1,6 @@
-"""ChainGuard-Core — daily LightGBM retraining DAG (Phase 4 / Task 4.1).
+"""Volatix-AI — daily LightGBM retraining DAG (Phase 4 / Task 4.1).
 
-Runs the chainguard-classifier image as an ephemeral KubernetesPodOperator
+Runs the volatix-classifier image as an ephemeral KubernetesPodOperator
 worker. The worker pulls yesterday's feature_log rows out of PostgreSQL,
 runs Purged K-Fold cross-validation, retrains LightGBM, and writes the
 new artifact + CV metrics into the `model_registry` table.
@@ -22,15 +22,15 @@ from kubernetes.client import models as k8s
 
 
 DEFAULT_ARGS = {
-    "owner": "chainguard",
+    "owner": "volatix",
     "depends_on_past": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
 }
 
-TRAINER_IMAGE = os.getenv("TRAINER_IMAGE", "chainguard-classifier:dev")
-DB_SECRET_NAME = os.getenv("DB_SECRET_NAME", "chainguard-db")
-MODELS_PVC = os.getenv("MODELS_PVC", "chainguard-models")
+TRAINER_IMAGE = os.getenv("TRAINER_IMAGE", "volatix-classifier:dev")
+DB_SECRET_NAME = os.getenv("DB_SECRET_NAME", "volatix-db")
+MODELS_PVC = os.getenv("MODELS_PVC", "volatix-models")
 NAMESPACE = os.getenv("RETRAIN_NAMESPACE", "default")
 
 
@@ -54,19 +54,19 @@ models_mount = k8s.V1VolumeMount(name="models", mount_path="/models")
 
 
 with DAG(
-    dag_id="chainguard_retraining",
+    dag_id="volatix_retraining",
     description="Nightly Purged K-Fold retraining of the LightGBM anomaly classifier",
     schedule="0 2 * * *",
     start_date=datetime(2026, 1, 1),
     catchup=False,
     default_args=DEFAULT_ARGS,
     max_active_runs=1,
-    tags=["chainguard", "phase-4", "ml"],
+    tags=["volatix", "phase-4", "ml"],
 ) as dag:
 
     retrain = KubernetesPodOperator(
         task_id="retrain_lightgbm",
-        name="chainguard-retrain",
+        name="volatix-retrain",
         namespace=NAMESPACE,
         image=TRAINER_IMAGE,
         image_pull_policy="IfNotPresent",

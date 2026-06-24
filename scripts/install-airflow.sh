@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ChainGuard-Core — install Apache Airflow into the local cluster (Phase 4.1).
+# Volatix-AI — install Apache Airflow into the local cluster (Phase 4.1).
 #
 # Idempotent. Adds the apache-airflow Helm repo, installs Airflow into the
 # `airflow` namespace, and ConfigMap-mounts the project's DAG folder so
@@ -36,8 +36,8 @@ ok "Helm repo cache refreshed"
 log "Creating namespace ${AIRFLOW_NAMESPACE}"
 kubectl create namespace "${AIRFLOW_NAMESPACE}" 2>/dev/null || true
 
-log "Packaging DAGs into ConfigMap chainguard-dags"
-kubectl create configmap chainguard-dags \
+log "Packaging DAGs into ConfigMap volatix-dags"
+kubectl create configmap volatix-dags \
     --from-file="${DAG_DIR}" \
     -n "${AIRFLOW_NAMESPACE}" \
     --dry-run=client -o yaml | kubectl apply -f -
@@ -49,10 +49,10 @@ helm upgrade --install "${AIRFLOW_RELEASE}" apache-airflow/airflow \
     --set "dags.gitSync.enabled=false" \
     --set "config.core.load_examples=False" \
     --set "executor=KubernetesExecutor" \
-    --set "extraVolumes[0].name=chainguard-dags" \
-    --set "extraVolumes[0].configMap.name=chainguard-dags" \
-    --set "extraVolumeMounts[0].name=chainguard-dags" \
-    --set "extraVolumeMounts[0].mountPath=/opt/airflow/dags/chainguard" \
+    --set "extraVolumes[0].name=volatix-dags" \
+    --set "extraVolumes[0].configMap.name=volatix-dags" \
+    --set "extraVolumeMounts[0].name=volatix-dags" \
+    --set "extraVolumeMounts[0].mountPath=/opt/airflow/dags/volatix" \
     --wait \
     --timeout "${WAIT_TIMEOUT}"
 

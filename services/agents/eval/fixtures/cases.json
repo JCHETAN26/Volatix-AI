@@ -3203,5 +3203,5 @@
   ],
   "count": 200,
   "revision": "0c663bb5d829174a678affeeb40fa0ecf44e369add2bebe1a32ac822a8c22f8e",
-  "schema": "chainguard.eval.fixture.v1"
+  "schema": "volatix.eval.fixture.v1"
 }

@@ -4,7 +4,7 @@
 # engine pipeline that broadcasts to the `financial-features` Kafka topic.
 # --------------------------------------------------------------------------
 
-add_executable(chainguard
+add_executable(volatix
     main.cpp
     engine.cpp
     features.cpp
@@ -12,11 +12,11 @@ add_executable(chainguard
     ws_client.cpp
 )
 
-target_compile_features(chainguard PRIVATE cxx_std_20)
+target_compile_features(volatix PRIVATE cxx_std_20)
 
-target_include_directories(chainguard PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(volatix PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(chainguard PRIVATE
+target_link_libraries(volatix PRIVATE
     Threads::Threads
     OpenSSL::SSL
     OpenSSL::Crypto
@@ -26,6 +26,6 @@ target_link_libraries(chainguard PRIVATE
     Boost::system
 )
 
-set_target_properties(chainguard PROPERTIES
+set_target_properties(volatix PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )

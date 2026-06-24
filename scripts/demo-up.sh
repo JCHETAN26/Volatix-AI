@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# ChainGuard-Core — full-stack demo bring-up (Phase 5.2, Supabase-backed).
+# Volatix-AI — full-stack demo bring-up (Phase 5.2, Supabase-backed).
 #
 # Idempotent. Steps:
 #   1. Verify $DATABASE_URL is set (Supabase connection string).
 #   2. Apply the schema (init-postgres → Supabase).
 #   3. Local infra (Minikube + Kafka + Qdrant) — NO in-cluster Postgres.
-#   4. Sync DATABASE_URL into the in-cluster `chainguard-db` Secret.
+#   4. Sync DATABASE_URL into the in-cluster `volatix-db` Secret.
 #   5. KEDA (event-driven autoscaler).
 #   6. Build + load the three service images (engine / classifier / agents).
 #   7. Apply k8s manifests for classifier + agents.
@@ -59,7 +59,7 @@ make infra-up
 # ---------------------------------------------------------------------------
 # 3. Mirror DATABASE_URL into the in-cluster Secret
 # ---------------------------------------------------------------------------
-log "Syncing chainguard-db Secret"
+log "Syncing volatix-db Secret"
 make set-db-url
 
 # ---------------------------------------------------------------------------
@@ -71,26 +71,26 @@ make keda-install
 # ---------------------------------------------------------------------------
 # 5. Build + load images
 # ---------------------------------------------------------------------------
-log "Building chainguard-core (engine)"
+log "Building volatix-core (engine)"
 make image-load
-log "Building chainguard-classifier"
+log "Building volatix-classifier"
 make classifier-load
-log "Building chainguard-agents"
+log "Building volatix-agents"
 make agents-load
-log "Building chainguard-mock-ticker (in-cluster synthetic feed)"
+log "Building volatix-mock-ticker (in-cluster synthetic feed)"
 make mock-ticker-load
-log "Building chainguard-realfeed (Coinbase WS adapter)"
+log "Building volatix-realfeed (Coinbase WS adapter)"
 make realfeed-load
 
 # ---------------------------------------------------------------------------
 # 6. Apply manifests
 # ---------------------------------------------------------------------------
 log "Deploying k8s manifests"
-make k8s-deploy           # chainguard-engine (KEDA --consume fixture) + ScaledObject
+make k8s-deploy           # volatix-engine (KEDA --consume fixture) + ScaledObject
 make classifier-deploy
 make agents-deploy
 make tickers-deploy       # mock-ticker + realfeed Services
-make engine-live-deploy   # chainguard-engine-live (--engine mode, drives the dashboard)
+make engine-live-deploy   # volatix-engine-live (--engine mode, drives the dashboard)
 
 # ---------------------------------------------------------------------------
 # 7. Seed Qdrant via a temporary port-forward
@@ -109,7 +109,7 @@ trap - EXIT
 # ---------------------------------------------------------------------------
 # 8. Long-running port-forwards (background; killed by demo-down.sh)
 # ---------------------------------------------------------------------------
-LOG_DIR="/tmp/chainguard-pf"
+LOG_DIR="/tmp/volatix-pf"
 mkdir -p "${LOG_DIR}"
 start_pf() {
     local label=$1 svc=$2 ports=$3

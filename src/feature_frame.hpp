@@ -1,4 +1,4 @@
-// ChainGuard-Core — serialized feature frame.
+// Volatix-AI — serialized feature frame.
 //
 // Phase 2.3 + post-1.0 "Receipt" extension. Network-stable,
 // trivially-copyable record published to the `financial-features` Kafka
@@ -15,7 +15,7 @@
 
 #include "tick_data.hpp"
 
-namespace chainguard {
+namespace volatix {
 
 // Bumped to 2 when the layout grew from 64 → 80 bytes to carry the
 // pipeline `case_id` and the engine-captured wire/compute timestamps
@@ -66,4 +66,4 @@ inline void serialize_feature_frame(const FeatureFrame& frame, void* dst) noexce
     std::memcpy(dst, &frame, sizeof(FeatureFrame));
 }
 
-}  // namespace chainguard
+}  // namespace volatix

@@ -1,4 +1,4 @@
-# ChainGuard-Core — Vector Database (Qdrant)
+# Volatix-AI — Vector Database (Qdrant)
 # Phase 1 / Task 1.2.
 #
 # Standalone Qdrant deployment for the Agentic RAG layer (used in Phase 4 by
@@ -20,7 +20,7 @@ metadata:
   labels:
     app.kubernetes.io/name: vector-db
     app.kubernetes.io/component: rag-store
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 data:
   # Minimal Qdrant config. The image ships sensible defaults; we only
   # override telemetry (off for local dev) and log level.
@@ -40,7 +40,7 @@ metadata:
   labels:
     app.kubernetes.io/name: vector-db
     app.kubernetes.io/component: rag-store
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   replicas: 1
   strategy:
@@ -53,7 +53,7 @@ spec:
       labels:
         app.kubernetes.io/name: vector-db
         app.kubernetes.io/component: rag-store
-        app.kubernetes.io/part-of: chainguard-core
+        app.kubernetes.io/part-of: volatix-core
     spec:
       containers:
         - name: qdrant
@@ -114,7 +114,7 @@ metadata:
   labels:
     app.kubernetes.io/name: vector-db
     app.kubernetes.io/component: rag-store
-    app.kubernetes.io/part-of: chainguard-core
+    app.kubernetes.io/part-of: volatix-core
 spec:
   type: ClusterIP
   selector:

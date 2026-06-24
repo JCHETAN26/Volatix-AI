@@ -1,6 +1,6 @@
-"""ChainGuard-Core — nightly LLM eval DAG (Phase 6 / Task 6.4).
+"""Volatix-AI — nightly LLM eval DAG (Phase 6 / Task 6.4).
 
-Runs the chainguard-agents image as an ephemeral KubernetesPodOperator
+Runs the volatix-agents image as an ephemeral KubernetesPodOperator
 worker. The worker replays the curated 200-case fixture through the
 LangGraph cluster, scores each case with Ragas faithfulness +
 answer_relevancy + binary freeze_correctness, and writes one eval_run
@@ -24,16 +24,16 @@ from kubernetes.client import models as k8s
 
 
 DEFAULT_ARGS = {
-    "owner": "chainguard",
+    "owner": "volatix",
     "depends_on_past": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
 }
 
-AGENTS_IMAGE = os.getenv("AGENTS_IMAGE", "chainguard-agents:dev")
-DB_SECRET_NAME = os.getenv("DB_SECRET_NAME", "chainguard-db")
-AGENTS_SECRET_NAME = os.getenv("AGENTS_SECRET_NAME", "chainguard-agents-secrets")
-AGENTS_CONFIG_MAP = os.getenv("AGENTS_CONFIG_MAP", "chainguard-agents-config")
+AGENTS_IMAGE = os.getenv("AGENTS_IMAGE", "volatix-agents:dev")
+DB_SECRET_NAME = os.getenv("DB_SECRET_NAME", "volatix-db")
+AGENTS_SECRET_NAME = os.getenv("AGENTS_SECRET_NAME", "volatix-agents-secrets")
+AGENTS_CONFIG_MAP = os.getenv("AGENTS_CONFIG_MAP", "volatix-agents-config")
 EVAL_NAMESPACE = os.getenv("EVAL_NAMESPACE", "default")
 
 
@@ -76,19 +76,19 @@ env_from = [
 
 
 with DAG(
-    dag_id="chainguard_eval",
+    dag_id="volatix_eval",
     description="Nightly Ragas + binary correctness eval of the LangGraph agent cluster",
     schedule="0 3 * * *",  # 1h after retraining DAG (02:00)
     start_date=datetime(2026, 5, 23),
     catchup=False,
     default_args=DEFAULT_ARGS,
     max_active_runs=1,
-    tags=["chainguard", "phase-6", "llm-eval"],
+    tags=["volatix", "phase-6", "llm-eval"],
 ) as dag:
 
     eval_run = KubernetesPodOperator(
         task_id="agent_eval_runner",
-        name="chainguard-agent-eval",
+        name="volatix-agent-eval",
         namespace=EVAL_NAMESPACE,
         image=AGENTS_IMAGE,
         image_pull_policy="IfNotPresent",
