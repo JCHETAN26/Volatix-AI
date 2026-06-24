@@ -1,6 +1,6 @@
 # ChainGuard-Core — Changelog
 
-## Unreleased
+## v1.1.0 — Phase 6 complete
 
 ### Phase 6 — LLM evaluation & observability
 

@@ -345,7 +345,33 @@ Implementation follows the strict sequence defined in `build-plan.md`. Each phas
 A nightly evaluation harness around the LangGraph agent cluster — the difference
 between *shipping an LLM demo* and *running LLMs in production*.
 
-![Eval dashboard with regression banner](docs/eval-regression.png)
+![Eval dashboard with two real 200-case runs and regression banner](docs/eval-dashboard.png)
+
+*Above: the `/eval` dashboard after two full 200-case runs against the live
+LangGraph cluster (`v1`, Gemini 2.5 Flash, ~3h35m each). Run #7 →
+`freeze_correctness=0.440, faithfulness=0.159, answer_relevancy=0.672`;
+Run #8 → `0.445, 0.147, 0.685`. Faithfulness dropped 7.5% on pure judge-LLM
+nondeterminism — over the 5% gate — so the regression banner fires.*
+
+**The findings the eval surfaced** (run #7 confusion matrix on 200 real cases):
+
+- Flash-loan classes (av-001, av-002): **20/20 each** — the agent's strongest path.
+- Pump-and-dump (av-004): **18/20**.
+- **Stop-hunt sweep (av-005): 2/20**. The agent collapses these into the
+  flash-loan-short class even though the OFI/vol profile is structurally
+  different.
+- **Spoofing — bid (av-007): 0/20**. Total miss; the rationale points at
+  flash-loan-short for every spoofing-bid case.
+- **Benign classes (av-009 cross-venue arb, av-010 earnings burst): 4/20 each**.
+  The agent over-freezes legitimate market activity 80% of the time.
+- Aggregate: **MONITOR→FREEZE 78/100, NO_ACTION→FREEZE 21/40**. The
+  Auditor's confidence gate (≥0.95) is too lenient given the prompts.
+
+The 0.159 faithfulness is real signal too — the auditor produces *correct*
+FREEZE decisions on flash-loan cases but doesn't reliably cite the
+Qdrant-retrieved attack vectors in its rationale. Exactly the failure mode
+binary accuracy alone would miss. Without this eval layer we'd ship the
+agent thinking it works.
 
 - **Curated fixture** (`services/agents/eval/fixtures/cases.json`) — 200
   cases generated deterministically from the 10-class attack-vector
